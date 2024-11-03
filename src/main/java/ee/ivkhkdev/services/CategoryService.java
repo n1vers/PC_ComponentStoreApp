@@ -1,19 +1,18 @@
 package ee.ivkhkdev.services;
 
-import ee.ivkhkdev.helpers.AppHelper;
+import ee.ivkhkdev.interfaces.AppHelper;
+import ee.ivkhkdev.interfaces.Service;
 import ee.ivkhkdev.model.Category;
-import ee.ivkhkdev.repositories.Repository;
+import ee.ivkhkdev.interfaces.Repository;
 
 import java.util.List;
 
 public class CategoryService  implements Service<Category> {
 
-    private final List<Category> categories;
     private Repository<Category> repository;
     private AppHelper<Category> appHelperCategory;
 
-    public CategoryService(List<Category> categories, Repository<Category> repository, AppHelper<Category> appHelperCategory) {
-        this.categories = categories;
+    public CategoryService( Repository<Category> repository, AppHelper<Category> appHelperCategory) {
         this.repository = repository;
         this.appHelperCategory = appHelperCategory;
     }
@@ -23,17 +22,7 @@ public class CategoryService  implements Service<Category> {
         Category category = appHelperCategory.create();
         if (category == null) return false;
         try {
-            for (int i = 0; i <= categories.size(); i++){
-                if(i == 0 ){
-                    categories.add(category);
-                    repository.save(category);
-                    break;
-                }else if(categories.get(i) == null){
-                    categories.add(category);
-                    repository.save(category);
-                    break;
-                }
-            }
+            repository.save(category);
             return true;
         }catch (Exception e) {
             System.out.println("Ошибка: " + e.toString());
@@ -43,11 +32,11 @@ public class CategoryService  implements Service<Category> {
 
     @Override
     public boolean print(){
-        return appHelperCategory.printList(categories);
+        return appHelperCategory.printList(repository.load());
     }
 
     @Override
     public List<Category> list(){
-        return categories;
+        return repository.load();
     }
 }

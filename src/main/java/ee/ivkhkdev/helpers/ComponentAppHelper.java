@@ -1,18 +1,20 @@
 package ee.ivkhkdev.helpers;
 
-import ee.ivkhkdev.input.Input;
+import ee.ivkhkdev.interfaces.AppHelper;
+import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.services.Service;
+import ee.ivkhkdev.interfaces.Service;
 
 import java.util.List;
+import java.util.Locale;
 
-public class AppHelperComponent implements AppHelper<Component> {
+public class ComponentAppHelper implements AppHelper<Component> {
 
     private final Input input;
     private final Service<Category> categoryService;
 
-    public AppHelperComponent(Input input, Service<Category> categoryService) {
+    public ComponentAppHelper(Input input, Service<Category> categoryService) {
         this.input = input;
         this.categoryService = categoryService;
     }
@@ -48,13 +50,17 @@ public class AppHelperComponent implements AppHelper<Component> {
     public boolean printList(List<Component> components) {
         try {
             if (components.size() == 0) return false;
-            for(int i = 0; i<components.size(); i++) {
+            for (int i = 0; i < components.size(); i++) {
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; j < components.get(i).getCategory().size(); j++) {
                     sb.append(components.get(i).getCategory().get(j).getCategoryName());
-                    sb.append(". ");
+                    // Убираем добавление точки здесь
+                    if (j < components.get(i).getCategory().size() - 1) {
+                        sb.append(", "); // добавляем запятую между категориями
+                    }
                 }
-                System.out.printf(
+
+                String outputLine = String.format(Locale.ENGLISH,
                         "%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f%n",
                         i + 1,
                         components.get(i).getBrand(),
@@ -62,11 +68,14 @@ public class AppHelperComponent implements AppHelper<Component> {
                         sb.toString(),
                         components.get(i).getPrice()
                 );
+
+                System.out.print(outputLine); // Не забывайте выводить строку
             }
             return true;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Ошибка при выводе списка компонентов: " + e.getMessage());
             return false;
         }
     }
+
 }

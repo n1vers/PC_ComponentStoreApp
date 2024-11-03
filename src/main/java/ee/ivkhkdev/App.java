@@ -1,15 +1,17 @@
 package ee.ivkhkdev;
 
-import ee.ivkhkdev.helpers.AppHelper;
-import ee.ivkhkdev.helpers.AppHelperCategory;
-import ee.ivkhkdev.helpers.AppHelperComponent;
-import ee.ivkhkdev.helpers.AppHelperCustomer;
-import ee.ivkhkdev.input.Input;
+import ee.ivkhkdev.interfaces.AppHelper;
+import ee.ivkhkdev.helpers.CategoryAppHelper;
+import ee.ivkhkdev.helpers.ComponentAppHelper;
+import ee.ivkhkdev.helpers.CustomerAppHelper;
+import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.input.ConsoleInput;
+import ee.ivkhkdev.interfaces.Service;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.repositories.Repository;
+import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.model.Purchase;
 import ee.ivkhkdev.services.CategoryService;
 import ee.ivkhkdev.services.ComponentService;
 import ee.ivkhkdev.services.CustomerService;
@@ -19,42 +21,19 @@ import java.util.List;
 import java.util.Scanner;
 
 public class App {
-    private Input input;
-    public List<Customer> customers;
-    public List<Component> components;
-    public List<Category> categories;
+    private final Input input;
+    private final Service<Category> categoryService;
+    private final Service<Component> componentService;
+    private final Service<Customer> customerService;
+    private final Service<Purchase> purchaseService;
 
-    private AppHelper appHelperComponent;
-    private AppHelper appHelperCustomer;
-    private AppHelper appHelperCategory;
-
-    private Repository<Component> componentRepository;
-    private Repository<Customer> customerRepository;
-    private Repository<Category> categoryRepository;
-
-    private ComponentService componentService;
-    private CustomerService customerService;
-    private CategoryService categoryService;
-
-    public App() {
-        componentRepository = new Storage<>("components.dat");
-        customerRepository = new Storage<>("customers.dat");
-        categoryRepository = new Storage<>("categories.dat");
-
-        this.components = this.componentRepository.load();
-        this.customers = this.customerRepository.load();
-        this.categories = this.categoryRepository.load();
-
-        this.input = new ConsoleInput(new Scanner(System.in));
-        this.categoryService = new CategoryService(categories, categoryRepository, new AppHelperCategory(input));
-
-        appHelperComponent = new AppHelperComponent(input,categoryService);
-        appHelperCustomer = new AppHelperCustomer(input);
-        appHelperCategory = new AppHelperCategory(input);
-
-        componentService = new ComponentService(components, componentRepository,appHelperComponent);
-        customerService = new CustomerService(customers,customerRepository,appHelperCustomer);
-        categoryService = new CategoryService(categories, categoryRepository, appHelperCategory);
+    public App(Input input, Service<Category> categoryService, Service<Component> componentService,
+               Service<Customer> customerService, Service<Purchase> purchaseService) {
+        this.input = input;
+        this.categoryService = categoryService;
+        this.componentService = componentService;
+        this.customerService = customerService;
+        this.purchaseService = purchaseService;
     }
 
     public void run() {
@@ -69,6 +48,8 @@ public class App {
             System.out.println("4. Список клиентов");
             System.out.println("5. Добавить категорию");
             System.out.println("6. Список категорий");
+            System.out.println("7. Купить товар");
+            System.out.println("8. Список купленных товаров");
             System.out.print("Введите номер задачи: ");
             int task = Integer.parseInt(input.nextLine());
             switch (task) {
@@ -110,6 +91,18 @@ public class App {
                 case 6:
                     if (categoryService.print()) {
                         System.out.println("-----------Конец списка категорий---------");
+                    }
+                    break;
+                case 7:
+                    if (purchaseService.add()) {
+                        System.out.println("Товар куплен");
+                    } else {
+                        System.out.println("Не удалось купить товар");
+                    }
+                    break;
+                case 8:
+                    if (purchaseService.print()) {
+                        System.out.println("-----------Конец списка купленных товаров---------");
                     }
                     break;
                 default:
