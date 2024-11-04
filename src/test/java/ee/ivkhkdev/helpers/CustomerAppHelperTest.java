@@ -58,4 +58,62 @@ class CustomerAppHelperTest {
         String expectedString = "1. Имя: Ivan, Фамилия: Ivanov, Email: ivanov@example.com";
         assertTrue(outMock.toString().contains(expectedString));
     }
+
+    @Test
+    void testUpdateWithValidInput() {
+        // Создаем список клиентов
+        List<Customer> customers = new ArrayList<>();
+        Customer customer = new Customer();
+        customer.setFirstName("Ivan");
+        customer.setLastName("Ivanov");
+        customer.setEmail("ivanov@example.com");
+        customers.add(customer);
+
+        // Настройка для ввода данных
+        when(inputMock.nextLine()).thenReturn("1", "NewFirstName", "NewLastName", "newemail@example.com");
+
+        // Выполняем метод update
+        Customer updatedCustomer = appHelperCustomer.update(customers);
+
+        // Проверка, что клиент был обновлен
+        assertNotNull(updatedCustomer, "Updated customer should not be null");
+        assertEquals("NewFirstName", updatedCustomer.getFirstName(), "First name should be updated");
+        assertEquals("NewLastName", updatedCustomer.getLastName(), "Last name should be updated");
+        assertEquals("newemail@example.com", updatedCustomer.getEmail(), "Email should be updated");
+    }
+
+    @Test
+    void testUpdateWithEmptyCustomerList() {
+        // Создаем пустой список клиентов
+        List<Customer> customers = new ArrayList<>();
+
+        // Выполняем метод update
+        Customer updatedCustomer = appHelperCustomer.update(customers);
+
+        // Проверка, что метод вернул null
+        assertNull(updatedCustomer, "Updated customer should be null for an empty list");
+        assertTrue(outMock.toString().contains("Список клиентов пуст"), "Expected message for empty list should be printed");
+    }
+
+    @Test
+    void testUpdateWithInvalidIndex() {
+        // Создаем список клиентов
+        List<Customer> customers = new ArrayList<>();
+        Customer customer = new Customer();
+        customer.setFirstName("Ivan");
+        customer.setLastName("Ivanov");
+        customer.setEmail("ivanov@example.com");
+        customers.add(customer);
+
+        // Настройка для ввода данных
+        when(inputMock.nextLine()).thenReturn("2"); // Неверный индекс
+
+        // Выполняем метод update
+        Customer updatedCustomer = appHelperCustomer.update(customers);
+
+        // Проверка, что метод вернул null
+        assertNull(updatedCustomer, "Updated customer should be null for an invalid index");
+        assertTrue(outMock.toString().contains("Ошибка при обновлении данных клиента"), "Expected error message should be printed");
+    }
+
 }

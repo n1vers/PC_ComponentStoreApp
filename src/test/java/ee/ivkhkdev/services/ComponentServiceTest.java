@@ -103,4 +103,61 @@ class ComponentServiceTest {
         assertEquals(mockComponentList, result);
         verify(repository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
+
+    @Test
+    void testEdit_SuccessfulUpdate() {
+        Component existingComponent = new Component();
+        existingComponent.setBrand("Old Brand");
+        existingComponent.setModel("Old Model");
+        existingComponent.setPrice(100.0);
+
+        Component updatedComponent = new Component();
+        updatedComponent.setBrand("New Brand");
+        updatedComponent.setModel("New Model");
+        updatedComponent.setPrice(150.0);
+
+        when(repository.load()).thenReturn(List.of(existingComponent));
+        when(appHelperComponent.update(anyList())).thenReturn(updatedComponent); // Убедитесь, что updatedComponent действительно соответствует тому, что вы ожидаете
+
+        boolean result = componentService.edit();
+
+        assertTrue(result);
+        verify(repository, times(1)).update(0, updatedComponent);
+    }
+
+    @Test
+    void testEdit_ComponentNotFound() {
+        // Подготовка: создать список компонентов и настроить заглушки
+        Component existingComponent = new Component();
+        existingComponent.setBrand("Old Brand");
+
+        // Настройка заглушек
+        when(repository.load()).thenReturn(List.of(existingComponent)); // Возвращаем существующий компонент
+        when(appHelperComponent.update(anyList())).thenReturn(new Component()); // Возвращаем новый компонент, который не совпадает с существующим
+
+        // Выполняем метод edit
+        boolean result = componentService.edit();
+
+        // Проверка
+        assertFalse(result);
+        verify(repository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+    }
+
+    @Test
+    void testEdit_UpdateReturnsNull() {
+        // Подготовка: создать компонент и настроить заглушки
+        Component existingComponent = new Component();
+        existingComponent.setBrand("Old Brand");
+
+        // Настройка заглушек
+        when(repository.load()).thenReturn(List.of(existingComponent)); // Возвращаем существующий компонент
+        when(appHelperComponent.update(anyList())).thenReturn(null); // Возвращаем null
+
+        // Выполняем метод edit
+        boolean result = componentService.edit();
+
+        // Проверка
+        assertFalse(result); // Ожидаем, что метод вернет false
+        verify(repository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+    }
 }

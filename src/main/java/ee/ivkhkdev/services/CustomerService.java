@@ -22,7 +22,6 @@ public class CustomerService implements Service<Customer> {
     public boolean add() {
         Customer customer = appHelperCustomer.create();
         if (customer == null) return false;
-        if (customer == null) return false;
         try {
             repository.save(customer);
             return true;
@@ -39,5 +38,27 @@ public class CustomerService implements Service<Customer> {
 
     public List<Customer> list() {
         return repository.load();
+    }
+
+    @Override
+    public boolean edit() {
+        List<Customer> customers = repository.load();
+        Customer updatedCustomer = appHelperCustomer.update(customers);
+        if (updatedCustomer == null) {
+            return false;
+        }
+        try {
+            int index = customers.indexOf(updatedCustomer);
+            if (index != -1) {
+                repository.update(index, updatedCustomer);
+                return true;
+            } else {
+                System.out.println("Клиент не найден в списке.");
+                return false;
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка при обновлении клиента: " + e.getMessage());
+            return false;
+        }
     }
 }

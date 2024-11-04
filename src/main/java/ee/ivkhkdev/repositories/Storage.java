@@ -64,4 +64,22 @@ public class Storage<T> implements Repository<T> {
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public void update(int index, T entity) {
+        List<T> entities = this.load();
+        if (entities == null) {
+            return;
+        }
+        entities.set(index, entity);
+        try (FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(entities);
+            objectOutputStream.flush();
+        } catch (FileNotFoundException e) {
+            System.out.println("Не найден файл"+e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Ошибка ввода"+e.getMessage());
+        }
+    }
 }

@@ -65,6 +65,9 @@ public class PurchaseAppHelper implements AppHelper<Purchase> {
         }
         return true;
     }
-
+    @Override
+    public Purchase update(List<Purchase> purchases) {
+        return null;
+    }
 
 }

@@ -39,4 +39,24 @@ public class ComponentService implements Service<Component> {
     public List<Component> list() {
         return repository.load();
     }
+
+    @Override
+    public boolean edit(){
+        List<Component> components = repository.load();
+        Component updateComponent = appHelperComponent.update(components);
+        if(updateComponent == null) return false;
+        try {
+            int index = components.indexOf(updateComponent);
+            if (index != -1) {
+                repository.update(index, updateComponent);
+                return true;
+            } else {
+                System.out.println("Компонент не найден в списке.");
+                return false;
+            }
+        }catch (Exception e) {
+            System.out.println("Ошибка при обновлении компонента: " + e.getMessage());
+            return false;
+        }
+    }
 }

@@ -44,12 +44,14 @@ public class App {
             System.out.println("0. Выйти из программы");
             System.out.println("1. Добавить компонент");
             System.out.println("2. Список компонентов");
-            System.out.println("3. Добавить клиента");
-            System.out.println("4. Список клиентов");
-            System.out.println("5. Добавить категорию");
-            System.out.println("6. Список категорий");
-            System.out.println("7. Купить товар");
-            System.out.println("8. Список купленных товаров");
+            System.out.println("3. Редактировать компонент");
+            System.out.println("4. Добавить клиента");
+            System.out.println("5. Список клиентов");
+            System.out.println("6. Редактировать клиента");
+            System.out.println("7. Добавить категорию");
+            System.out.println("8. Список категорий");
+            System.out.println("9. Купить товар");
+            System.out.println("10. Список купленных товаров");
             System.out.print("Введите номер задачи: ");
             int task = Integer.parseInt(input.nextLine());
             switch (task) {
@@ -70,37 +72,51 @@ public class App {
                     }
                     break;
                 case 3:
+                    if (componentService.edit()){
+                        System.out.println("Товар успешно изменен");
+                    }  else{
+                        System.out.println("Товар изменить не удалось");
+                    }
+                    break;
+                case 4:
                     if (customerService.add()) {
                         System.out.println("Клиент добавлен");
                     } else {
                         System.out.println("Не удалось добавить клиента");
                     }
                     break;
-                case 4:
+                case 5:
                     if (customerService.print()) {
                         System.out.println("-----------Конец списка---------");
                     }
                     break;
-                case 5:
+                case 6:
+                    if (customerService.edit()) {
+                        System.out.println("Клиент успешно изменен");
+                    } else {
+                        System.out.println("Клиента изменить не удалось");
+                    }
+                    break;
+                case 7:
                     if (categoryService.add()) {
                         System.out.println("Категория добавлена");
                     } else {
                         System.out.println("Не удалось добавить категорию");
                     }
                     break;
-                case 6:
+                case 8:
                     if (categoryService.print()) {
                         System.out.println("-----------Конец списка категорий---------");
                     }
                     break;
-                case 7:
+                case 9:
                     if (purchaseService.add()) {
                         System.out.println("Товар куплен");
                     } else {
                         System.out.println("Не удалось купить товар");
                     }
                     break;
-                case 8:
+                case 10:
                     if (purchaseService.print()) {
                         System.out.println("-----------Конец списка купленных товаров---------");
                     }

@@ -38,4 +38,9 @@ public class PurchaseService implements Service<Purchase> {
     public List<Purchase> list() {
         return repository.load();
     }
+
+    @Override
+    public boolean edit(){
+        return false;
+    }
 }

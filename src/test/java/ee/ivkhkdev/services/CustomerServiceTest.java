@@ -98,4 +98,77 @@ class CustomerServiceTest {
         assertEquals(mockCustomerList, result);
         verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
+
+    @Test
+    void testEditCustomerSuccess() {
+        // Подготовка: создать список клиентов и настроить заглушки
+        Customer existingCustomer = new Customer(); // Существующий клиент
+        Customer updatedCustomer = new Customer(); // Обновленный клиент
+
+        // Настройка: существующий клиент будет найден и обновлен
+        List<Customer> mockCustomerList = List.of(existingCustomer);
+        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
+
+
+        // Выполняем метод edit
+        boolean result = customerService.edit();
+
+        // Проверка
+        assertTrue(result);
+        verify(mockRepository, times(1)).update(0, updatedCustomer); // Убедиться, что метод update был вызван один раз с правильным индексом
+    }
+
+    @Test
+    void testEditCustomerFailureWhenUpdatedCustomerIsNull() {
+        // Настроить заглушку, чтобы update возвращал null
+        List<Customer> mockCustomerList = List.of(new Customer());
+        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(null);
+
+        // Выполняем метод edit
+        boolean result = customerService.edit();
+
+        // Проверка
+        assertFalse(result);
+        verify(mockRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+    }
+
+    @Test
+    void testEditCustomerNotFound() {
+        // Подготовка: создать список клиентов и настроить заглушки
+        Customer existingCustomer = new Customer();
+        Customer updatedCustomer = new Customer(); // Этот клиент не будет найден
+
+        List<Customer> mockCustomerList = List.of(existingCustomer);
+        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
+
+        // Выполняем метод edit
+        boolean result = customerService.edit();
+
+        // Проверка
+        assertFalse(result);
+        verify(mockRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+    }
+
+    @Test
+    void testEditCustomerExceptionHandling() {
+        // Подготовка: создать список клиентов и вызвать исключение при обновлении
+        Customer existingCustomer = new Customer();
+        Customer updatedCustomer = new Customer();
+
+        List<Customer> mockCustomerList = List.of(existingCustomer);
+        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
+
+        // Настройка: выбросить исключение при вызове update
+        doThrow(new RuntimeException("Update error")).when(mockRepository).update(anyInt(), eq(updatedCustomer));
+
+        // Выполняем метод edit
+        boolean result = customerService.edit();
+
+        // Проверка
+        assertFalse(result); // Ожидаем, что метод вернет false при возникновении исключения
+    }
 }

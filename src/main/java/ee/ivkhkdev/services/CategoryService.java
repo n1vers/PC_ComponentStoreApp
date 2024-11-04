@@ -39,4 +39,9 @@ public class CategoryService  implements Service<Category> {
     public List<Category> list(){
         return repository.load();
     }
+
+    @Override
+    public boolean edit(){
+        return false;
+    }
 }

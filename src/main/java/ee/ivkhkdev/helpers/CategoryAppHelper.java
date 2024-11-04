@@ -3,6 +3,7 @@ package ee.ivkhkdev.helpers;
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.model.Category;
+import ee.ivkhkdev.model.Component;
 
 import java.util.List;
 
@@ -40,5 +41,9 @@ public class CategoryAppHelper implements AppHelper<Category> {
             return false;
         }
     }
+    @Override
+    public Category update(List<Category> categories) {
 
+        return null;
+    }
 }
