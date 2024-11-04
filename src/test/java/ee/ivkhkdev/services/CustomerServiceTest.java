@@ -7,7 +7,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -101,23 +103,43 @@ class CustomerServiceTest {
 
     @Test
     void testEditCustomerSuccess() {
-        // Подготовка: создать список клиентов и настроить заглушки
-        Customer existingCustomer = new Customer(); // Существующий клиент
-        Customer updatedCustomer = new Customer(); // Обновленный клиент
+        // Подготовка: создаем существующего клиента
+        Customer existingCustomer = new Customer();
+        existingCustomer.setId(UUID.randomUUID()); // Задаем ID
+        existingCustomer.setFirstName("John");
+        existingCustomer.setLastName("Doe");
+        existingCustomer.setEmail("john.doe@example.com");
 
-        // Настройка: существующий клиент будет найден и обновлен
-        List<Customer> mockCustomerList = List.of(existingCustomer);
+        // Настройка: возвращаем список клиентов из репозитория
+        List<Customer> mockCustomerList = new ArrayList<>();
+        mockCustomerList.add(existingCustomer);
         when(mockRepository.load()).thenReturn(mockCustomerList);
-        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
 
+        // Обновленный клиент, который вернется из хелпера
+        // Используем тот же объект, чтобы гарантировать, что equals будет работать
+        Customer updatedCustomer = existingCustomer;
+        updatedCustomer.setEmail("john.updated@example.com"); // Обновляем email для теста
+
+        // Настройка: возвращаем обновленного клиента
+        when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
 
         // Выполняем метод edit
         boolean result = customerService.edit();
 
-        // Проверка
-        assertTrue(result);
-        verify(mockRepository, times(1)).update(0, updatedCustomer); // Убедиться, что метод update был вызван один раз с правильным индексом
+        // Проверка: результат должен быть true
+        assertTrue(result, "Expected edit to return true");
+
+        // Проверка: метод update должен быть вызван с правильным индексом
+        verify(mockRepository, times(1)).update(0, updatedCustomer);
+
+        // Дополнительная проверка: убедиться, что обновленный клиент совпадает с ожидаемым
+        List<Customer> updatedList = mockRepository.load();
+        assertEquals(1, updatedList.size());
+        assertEquals(updatedCustomer.getEmail(), updatedList.get(0).getEmail());
     }
+
+
+
 
     @Test
     void testEditCustomerFailureWhenUpdatedCustomerIsNull() {

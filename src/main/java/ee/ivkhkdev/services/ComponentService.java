@@ -54,7 +54,7 @@ public class ComponentService implements Service<Component> {
                 System.out.println("Компонент не найден в списке.");
                 return false;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Ошибка при обновлении компонента: " + e.getMessage());
             return false;
         }

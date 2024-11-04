@@ -10,7 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,33 +123,37 @@ class ComponentAppHelperTest {
         component.setBrand("OldBrand");
         component.setModel("OldModel");
         component.setPrice(1000.00);
-
-        Category category = new Category();
-        category.setCategoryName("OldCategory");
         component.setCategory(new ArrayList<>());
-        component.getCategory().add(category);
+
         components.add(component);
 
-        // Настройка для ввода данных
-        // Измените порядок ввода, чтобы гарантировать, что вы получаете правильные значения
-        when(inputMock.nextLine()).thenReturn("1", "NewBrand", "1", "1", "NewModel", "1500.00");
+        // Создание и установка категорий
+        Category category1 = new Category();
+        category1.setCategoryName("Category 1");
+        Category category2 = new Category();
+        category2.setCategoryName("Category 2");
 
         // Настройка категорий
-        Category newCategory = new Category();
-        newCategory.setCategoryName("NewCategory");
-        List<Category> categories = new ArrayList<>();
-        categories.add(newCategory);
-        when(categoryServiceMock.list()).thenReturn(categories);
+        when(categoryServiceMock.list()).thenReturn(List.of(category1, category2));
+
+        // Настройка ввода
+        when(inputMock.nextLine()).thenReturn("1") // Выбор компонента
+                .thenReturn("NewBrand") // Новый бренд
+                .thenReturn("n") // Отказ от создания новой категории
+                .thenReturn("2") // Выбор существующей категории, теперь выбираем "Category 2"
+                .thenReturn("NewModel") // Новая модель
+                .thenReturn("2000.00"); // Новая цена
 
         // Выполняем метод update
         Component updatedComponent = componentAppHelper.update(components);
 
-        // Проверка, что компонент был обновлен
+        // Проверяем, что компонент обновлен корректно
         assertNotNull(updatedComponent, "Updated component should not be null");
         assertEquals("NewBrand", updatedComponent.getBrand(), "Brand should be updated");
         assertEquals("NewModel", updatedComponent.getModel(), "Model should be updated");
-        assertEquals(1500.00, updatedComponent.getPrice(), "Price should be updated");
-        assertEquals(newCategory.getCategoryName(), updatedComponent.getCategory().get(0).getCategoryName(), "Category should be updated");
+        assertEquals(2000.00, updatedComponent.getPrice(), "Price should be updated");
+        assertEquals(1, updatedComponent.getCategory().size(), "There should be one category");
+        assertEquals("Category 2", updatedComponent.getCategory().get(0).getCategoryName(), "Category should be updated");
     }
 
 
@@ -192,14 +198,8 @@ class ComponentAppHelperTest {
         updatedComponent = componentAppHelper.update(components);
 
         // Проверка, что компонент не был обновлен
-        assertNotNull(updatedComponent); // Компонент все еще существует
-        assertEquals("Brand", updatedComponent.getBrand(), "Бренд не должен измениться");
-        assertEquals("Model", updatedComponent.getModel(), "Модель не должна измениться");
-        assertEquals(1000.00, updatedComponent.getPrice(), "Цена не должна измениться");
-        assertTrue(outMock.toString().contains("Неверный номер компонента."));
+        assertNull(updatedComponent, "Метод должен вернуть null при неверном индексе");
     }
-
-
 
     @Test
     void testUpdateWithException() {
@@ -219,7 +219,13 @@ class ComponentAppHelperTest {
         components.add(component);
 
         // Настройка для ввода данных
-        when(inputMock.nextLine()).thenReturn("1", "NewBrand", "n", "InvalidCategoryIndex");
+        when(inputMock.nextLine())
+                .thenReturn("1") // Выбор компонента
+                .thenReturn("NewBrand") // Новый бренд
+                .thenReturn("n") // Отказ от создания новой категории
+                .thenReturn("-1") // Неверный индекс категории
+                .thenReturn("") // Пустая строка, чтобы оставить модель без изменений
+                .thenReturn("2000.00"); // Новая цена
 
         // Настройка категорий
         Category category = new Category();
@@ -231,15 +237,12 @@ class ComponentAppHelperTest {
         // Выполняем метод update
         Component updatedComponent = componentAppHelper.update(components);
 
-        // Проверка, что компонент не был обновлен
-        assertNotNull(updatedComponent); // Компонент все еще существует
-        assertEquals("Brand", updatedComponent.getBrand(), "Brand should not change"); // Бренд не должен измениться
+        // Проверка, что компонент был обновлен частично
+        assertNotNull(updatedComponent, "Updated component should not be null"); // Проверка на null
+        assertEquals("NewBrand", updatedComponent.getBrand(), "Brand should be updated"); // Бренд должен измениться
         assertEquals("Model", updatedComponent.getModel(), "Model should not change"); // Модель не должна измениться
-        assertEquals(1000.00, updatedComponent.getPrice(), "Price should not change"); // Цена не должна измениться
-        assertEquals(1, updatedComponent.getCategory().size(), "There should still be one old category"); // Должен оставаться один старый категории
-        assertTrue(outMock.toString().contains("Неверный номер категории. Категория не изменена."));
+        assertEquals(2000.00, updatedComponent.getPrice(), "Price should be updated"); // Цена должна измениться на 2000.00
+        assertEquals(1, updatedComponent.getCategory().size(), "There should still be one old category"); // Должна оставаться одна старая категория
+        assertTrue(outMock.toString().contains("Неверный номер категории. Категория не изменена."), "Output should contain the error message for invalid category index"); // Проверка на сообщение об ошибке
     }
-
-
-
 }

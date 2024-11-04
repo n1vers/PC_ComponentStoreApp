@@ -33,7 +33,7 @@ public class ComponentAppHelper implements AppHelper<Component> {
             }
             System.out.printf("Выберите номер категории из списка: ");
             int numberCategory = Integer.parseInt(input.nextLine());
-            component.getCategory().add(categoryService.list().get(numberCategory-1));
+            component.getCategory().add(categoryService.list().get(numberCategory - 1));
 
 
             System.out.print("Введите модель компонента: ");
@@ -41,11 +41,12 @@ public class ComponentAppHelper implements AppHelper<Component> {
             System.out.print("Введите цену компонента: ");
             component.setPrice(Double.parseDouble(input.nextLine()));
             return component;
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Ошибка при создании компонента: " + e.getMessage());
             return null;
         }
     }
+
     @Override
     public boolean printList(List<Component> components) {
         try {
@@ -77,6 +78,7 @@ public class ComponentAppHelper implements AppHelper<Component> {
             return false;
         }
     }
+
     @Override
     public Component update(List<Component> components) {
         if (components.isEmpty()) {
@@ -84,22 +86,23 @@ public class ComponentAppHelper implements AppHelper<Component> {
             return null;
         }
 
-        for (int i = 0; i < components.size(); i++) {
-            System.out.printf("%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f%n",
-                    i + 1,
-                    components.get(i).getBrand(),
-                    components.get(i).getModel(),
-                    components.get(i).getCategory().get(0).getCategoryName(),
-                    components.get(i).getPrice());
-        }
-
-        System.out.print("Введите номер компонента для редактирования: ");
-        int index;
         try {
-            index = Integer.parseInt(input.nextLine()) - 1;
+            // Вывод списка компонентов
+            for (int i = 0; i < components.size(); i++) {
+                System.out.printf("%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f%n",
+                        i + 1,
+                        components.get(i).getBrand(),
+                        components.get(i).getModel(),
+                        components.get(i).getCategory().isEmpty() ? "N/A" : components.get(i).getCategory().get(0).getCategoryName(),
+                        components.get(i).getPrice());
+            }
+
+            System.out.print("Введите номер компонента для редактирования: ");
+            int index = Integer.parseInt(input.nextLine()) - 1;
+
             if (index < 0 || index >= components.size()) {
                 System.out.println("Неверный номер компонента.");
-                return components.get(0); // Возвращаем первый компонент без изменений
+                return null;  // Возвращаем null при неверном индексе
             }
 
             Component component = components.get(index);
@@ -130,12 +133,16 @@ public class ComponentAppHelper implements AppHelper<Component> {
                 System.out.print("Выберите новую категорию (или нажмите Enter, чтобы оставить без изменений): ");
                 String categoryInput = input.nextLine();
                 if (!categoryInput.isEmpty()) {
-                    int categoryIndex = Integer.parseInt(categoryInput) - 1;
-                    if (categoryIndex < 0 || categoryIndex >= categories.size()) {
-                        System.out.println("Неверный номер категории. Категория не изменена.");
-                    } else {
-                        component.getCategory().clear();
-                        component.getCategory().add(categories.get(categoryIndex));
+                    try {
+                        int categoryIndex = Integer.parseInt(categoryInput) - 1;
+                        if (categoryIndex < 0 || categoryIndex >= categories.size()) {
+                            System.out.println("Неверный номер категории. Категория не изменена.");
+                        } else {
+                            component.getCategory().clear();
+                            component.getCategory().add(categories.get(categoryIndex));
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Ошибка: Неверный формат ввода.");
                     }
                 }
             }
@@ -151,12 +158,14 @@ public class ComponentAppHelper implements AppHelper<Component> {
             if (!priceInput.isEmpty()) {
                 component.setPrice(Double.parseDouble(priceInput));
             }
-
             return component; // Возвращаем обновленный компонент
-        } catch (Exception e) {
-            System.out.println("Ошибка: " + e.getMessage());
-            return components.get(0); // Возвращаем первый компонент в случае ошибки
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Ошибка: индекс вне допустимого диапазона.");
         }
+
+        return null; // Возвращаем null в случае ошибки
     }
 
 }

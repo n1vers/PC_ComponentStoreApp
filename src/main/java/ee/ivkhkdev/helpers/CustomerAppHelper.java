@@ -53,6 +53,7 @@ public class CustomerAppHelper implements AppHelper<Customer> {
             System.out.println("Список клиентов пуст");
             return null;
         }
+        // Выводим список клиентов для редактирования
         for (int i = 0; i < customers.size(); i++) {
             System.out.printf("%d. Имя: %s, Фамилия: %s, Email: %s%n",
                     i + 1,
@@ -61,28 +62,34 @@ public class CustomerAppHelper implements AppHelper<Customer> {
                     customers.get(i).getEmail());
         }
 
-        System.out.println("Введите номер клиента для редактирования: ");
+        System.out.print("Введите номер клиента для редактирования: ");
         int index;
         try {
-            index = Integer.parseInt(input.nextLine())-1 ;
-            Customer customer = customers.get(index);
-            System.out.printf("Текущее имя: %s. Введите новое имя или нажмите Enter,чтобы оставить без изменений:", customer.getFirstName());
+            index = Integer.parseInt(input.nextLine()) - 1;
+            Customer customer = customers.get(index); // Получаем клиента для редактирования
+
+            // Здесь обновляем поля клиента
+            System.out.printf("Текущее имя: %s. Введите новое имя или нажмите Enter, чтобы оставить без изменений: ", customer.getFirstName());
             String firstName = input.nextLine();
             if (!firstName.isEmpty()) {
                 customer.setFirstName(firstName);
             }
-            System.out.printf("Текущая фамилия: %s. Введите новую фамилию или нажмите Enter,чтобы оставить без изменений:", customer.getLastName());
+
+            // Аналогично для других полей
+            System.out.printf("Текущая фамилия: %s. Введите новую фамилию или нажмите Enter, чтобы оставить без изменений: ", customer.getLastName());
             String lastName = input.nextLine();
             if (!lastName.isEmpty()) {
                 customer.setLastName(lastName);
             }
-            System.out.printf("Текущая почта: %s. Введите новый адресс э.почты или нажмите Enter,чтобы оставить без изменений:", customer.getEmail());
+
+            System.out.printf("Текущий email: %s. Введите новый email или нажмите Enter, чтобы оставить без изменений: ", customer.getEmail());
             String email = input.nextLine();
             if (!email.isEmpty()) {
                 customer.setEmail(email);
             }
-            return customer;
-        }catch (Exception e) {
+
+            return customer; // Возвращаем обновленный объект
+        } catch (Exception e) {
             System.out.println("Ошибка при обновлении данных клиента: " + e.getMessage());
             return null;
         }

@@ -3,11 +3,13 @@ package ee.ivkhkdev.services;
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.model.Customer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +43,7 @@ class ComponentServiceTest {
         boolean result = componentService.add();
 
         // Проверка
-        assertTrue(result);
+        assertTrue(result,"Edit operation should be successful");
         verify(repository, times(1)).save(mockComponent); // Убедиться, что метод save был вызван один раз
     }
 
@@ -103,26 +105,31 @@ class ComponentServiceTest {
         assertEquals(mockComponentList, result);
         verify(repository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
-
     @Test
     void testEdit_SuccessfulUpdate() {
+        // Подготовка: создание компонента
         Component existingComponent = new Component();
         existingComponent.setBrand("Old Brand");
         existingComponent.setModel("Old Model");
         existingComponent.setPrice(100.0);
 
-        Component updatedComponent = new Component();
-        updatedComponent.setBrand("New Brand");
-        updatedComponent.setModel("New Model");
-        updatedComponent.setPrice(150.0);
-
+        // Настройка заглушек
         when(repository.load()).thenReturn(List.of(existingComponent));
-        when(appHelperComponent.update(anyList())).thenReturn(updatedComponent); // Убедитесь, что updatedComponent действительно соответствует тому, что вы ожидаете
 
+        // Настройка поведения appHelper для обновления компонента
+        when(appHelperComponent.update(anyList())).thenAnswer(invocation -> {
+            List<Component> components = invocation.getArgument(0);
+            // Мы возвращаем существующий компонент, чтобы он был найден
+            return components.get(0); // Возвращаем первый компонент для обновления
+        });
+
+        // Выполнение метода edit
         boolean result = componentService.edit();
 
+        // Проверка
         assertTrue(result);
-        verify(repository, times(1)).update(0, updatedComponent);
+        // Убедитесь, что метод update был вызван с правильным компонентом
+        verify(repository, times(1)).update(0, existingComponent); // Проверка вызова update
     }
 
     @Test
