@@ -10,17 +10,18 @@ public class Customer implements Serializable {
     private String firstName;
     private String lastName;
     private String email;
-
+    private double cash;
 
     public Customer() {
         this.id = UUID.randomUUID();
     }
 
-    public Customer( String firstName, String lastName, String email) {
+    public Customer( String firstName, String lastName, String email, double cash) {
         this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.cash = cash;
     }
 
     public UUID getId() {
@@ -55,17 +56,25 @@ public class Customer implements Serializable {
         this.email = email;
     }
 
+    public double getCash() {
+        return cash;
+    }
+
+    public void setCash(double cash) {
+        this.cash = cash;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
-        return Objects.equals(id, customer.id) && Objects.equals(firstName, customer.firstName) && Objects.equals(lastName, customer.lastName) && Objects.equals(email, customer.email);
+        return Double.compare(cash, customer.cash) == 0 && Objects.equals(id, customer.id) && Objects.equals(firstName, customer.firstName) && Objects.equals(lastName, customer.lastName) && Objects.equals(email, customer.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, email);
+        return Objects.hash(id, firstName, lastName, email, cash);
     }
 
     @Override
@@ -75,6 +84,7 @@ public class Customer implements Serializable {
         sb.append(", firstName='").append(firstName).append('\'');
         sb.append(", lastName='").append(lastName).append('\'');
         sb.append(", email='").append(email).append('\'');
+        sb.append(", cash=").append(cash);
         sb.append('}');
         return sb.toString();
     }

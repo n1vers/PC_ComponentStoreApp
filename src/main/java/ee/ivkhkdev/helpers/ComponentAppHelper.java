@@ -60,7 +60,7 @@ public class ComponentAppHelper implements AppHelper<Component> {
                 }
 
                 String outputLine = String.format(Locale.ENGLISH,
-                        "%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f%n",
+                        "%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f $%n ",
                         i + 1,
                         components.get(i).getBrand(),
                         components.get(i).getModel(),
@@ -142,7 +142,7 @@ public class ComponentAppHelper implements AppHelper<Component> {
                 component.setModel(model);
             }
 
-            System.out.printf("Текущая цена: %.2f. Введите новую цену или нажмите Enter, чтобы оставить без изменений: ", component.getPrice());
+            System.out.printf(Locale.ENGLISH,"Текущая цена: %.2f $. Введите новую цену или нажмите Enter, чтобы оставить без изменений: ", component.getPrice());
             String priceInput = input.nextLine();
             if (!priceInput.isEmpty()) {
                 component.setPrice(Double.parseDouble(priceInput));

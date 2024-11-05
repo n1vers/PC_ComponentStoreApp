@@ -40,17 +40,18 @@ class CustomerAppHelperTest {
 
     @Test
     void create() {
-        when(inputMock.nextLine()).thenReturn("Ivan", "Ivanov", "ivanov@example.com");
+        when(inputMock.nextLine()).thenReturn("Ivan", "Ivanov", "ivanov@example.com", 40);
         Customer actual = appHelperCustomer.create();
-        Customer expected = new Customer("Ivan", "Ivanov", "ivanov@example.com");
+        Customer expected = new Customer("Ivan", "Ivanov", "ivanov@example.com",40);
         assertEquals(actual.getFirstName(), expected.getFirstName());
         assertEquals(actual.getLastName(), expected.getLastName());
         assertEquals(actual.getEmail(), expected.getEmail());
+        assertEquals(actual.getCash(), expected.getCash());
     }
 
     @Test
     void printList() {
-        Customer customer = new Customer("Ivan", "Ivanov", "ivanov@example.com");
+        Customer customer = new Customer("Ivan", "Ivanov", "ivanov@example.com",40);
         List<Customer> customers = new ArrayList<>();
         customers.add(customer);
         boolean result = appHelperCustomer.printList(customers);

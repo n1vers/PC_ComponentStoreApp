@@ -37,7 +37,6 @@ public class Main {
         AppHelper<Purchase> purchaseAppHelper = new PurchaseAppHelper(input, componentService, customerService);
         Service<Purchase> purchaseService = new PurchaseService(purchaseAppHelper, purchaseRepository);
 
-
         App app = new App(input, categoryService, componentService, customerService, purchaseService);
         app.run();
     }

@@ -2,6 +2,7 @@ package ee.ivkhkdev.helpers;
 
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.interfaces.Input;
+import ee.ivkhkdev.interfaces.Repository;
 import ee.ivkhkdev.interfaces.Service;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
@@ -38,10 +39,18 @@ public class PurchaseAppHelper implements AppHelper<Purchase> {
         int customerNumber = Integer.parseInt(input.nextLine());
         Customer customer = customerService.list().get(customerNumber - 1);
 
+        double newBalance = customer.getCash() - component.getPrice();
+        if (newBalance < 0) {
+            System.out.println("Недостаточно средств на балансе клиента для этой покупки.");
+            return null;
+        }
+        customer.setCash(newBalance);
+
         Purchase purchase = new Purchase();
         purchase.setComponent(component);
         purchase.setCustomer(customer);
         purchase.setPurchaseDate(LocalDate.now());
+
         return purchase;
     }
 
@@ -63,6 +72,7 @@ public class PurchaseAppHelper implements AppHelper<Purchase> {
                     purchase.getPurchaseDate()
             );
         }
+
         return true;
     }
     @Override

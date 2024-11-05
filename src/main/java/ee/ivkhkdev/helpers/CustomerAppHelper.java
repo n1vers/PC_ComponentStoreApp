@@ -5,6 +5,7 @@ import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.model.Customer;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CustomerAppHelper implements AppHelper<Customer> {
     private final Input input;
@@ -23,6 +24,8 @@ public class CustomerAppHelper implements AppHelper<Customer> {
             customer.setLastName(input.nextLine());
             System.out.print("Введите email клиента: ");
             customer.setEmail(input.nextLine());
+            System.out.print("Введите первоначальный баланс:");
+            customer.setCash(Integer.parseInt(input.nextLine()));
             return customer;
         } catch (Exception e) {
             System.out.println("Ошибка при создании клиента: " + e.getMessage());
@@ -33,13 +36,14 @@ public class CustomerAppHelper implements AppHelper<Customer> {
     @Override
     public boolean printList(List<Customer> customers) {
         try {
-            if (customers.size() == 0) return false;
+            if (customers.isEmpty()) return false;
             for (int i = 0; i < customers.size(); i++) {
-                System.out.printf("%d. Имя: %s, Фамилия: %s, Email: %s%n",
+                System.out.printf(Locale.ENGLISH,"%d. Имя: %s, Фамилия: %s, Email: %s, Баланс: %.2f $\n",
                         i + 1,
                         customers.get(i).getFirstName(),
                         customers.get(i).getLastName(),
-                        customers.get(i).getEmail());
+                        customers.get(i).getEmail(),
+                        customers.get(i).getCash());
             }
             return true;
         } catch (Exception e) {
@@ -59,7 +63,7 @@ public class CustomerAppHelper implements AppHelper<Customer> {
         int index;
         try {
             index = Integer.parseInt(input.nextLine()) - 1;
-            Customer customer = customers.get(index); // Получаем клиента для редактирования
+            Customer customer = customers.get(index);
 
             // Здесь обновляем поля клиента
             System.out.printf("Текущее имя: %s. Введите новое имя или нажмите Enter, чтобы оставить без изменений: ", customer.getFirstName());
@@ -80,8 +84,12 @@ public class CustomerAppHelper implements AppHelper<Customer> {
             if (!email.isEmpty()) {
                 customer.setEmail(email);
             }
-
-            return customer; // Возвращаем обновленный объект
+            System.out.printf(Locale.ENGLISH,"Текущий баланс: %.2f $. Введите новый баланс или нажмите Enter, чтобы оставить без изменений:", customer.getCash());
+            double cash = Double.parseDouble(input.nextLine());
+            if (!Double.isNaN(cash)){
+                customer.setCash(cash);
+            }
+            return customer;
         } catch (Exception e) {
             System.out.println("Ошибка при обновлении данных клиента: " + e.getMessage());
             return null;
