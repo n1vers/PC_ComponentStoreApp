@@ -35,7 +35,6 @@ public class ComponentAppHelper implements AppHelper<Component> {
             int numberCategory = Integer.parseInt(input.nextLine());
             component.getCategory().add(categoryService.list().get(numberCategory - 1));
 
-
             System.out.print("Введите модель компонента: ");
             component.setModel(input.nextLine());
             System.out.print("Введите цену компонента: ");
@@ -55,9 +54,8 @@ public class ComponentAppHelper implements AppHelper<Component> {
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; j < components.get(i).getCategory().size(); j++) {
                     sb.append(components.get(i).getCategory().get(j).getCategoryName());
-                    // Убираем добавление точки здесь
                     if (j < components.get(i).getCategory().size() - 1) {
-                        sb.append(", "); // добавляем запятую между категориями
+                        sb.append(", ");
                     }
                 }
 
@@ -87,22 +85,13 @@ public class ComponentAppHelper implements AppHelper<Component> {
         }
 
         try {
-            // Вывод списка компонентов
-            for (int i = 0; i < components.size(); i++) {
-                System.out.printf("%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f%n",
-                        i + 1,
-                        components.get(i).getBrand(),
-                        components.get(i).getModel(),
-                        components.get(i).getCategory().isEmpty() ? "N/A" : components.get(i).getCategory().get(0).getCategoryName(),
-                        components.get(i).getPrice());
-            }
-
+            this.printList(components);
             System.out.print("Введите номер компонента для редактирования: ");
             int index = Integer.parseInt(input.nextLine()) - 1;
 
             if (index < 0 || index >= components.size()) {
                 System.out.println("Неверный номер компонента.");
-                return null;  // Возвращаем null при неверном индексе
+                return null;
             }
 
             Component component = components.get(index);
@@ -158,14 +147,14 @@ public class ComponentAppHelper implements AppHelper<Component> {
             if (!priceInput.isEmpty()) {
                 component.setPrice(Double.parseDouble(priceInput));
             }
-            return component; // Возвращаем обновленный компонент
+            return component;
         } catch (NumberFormatException e) {
             System.out.println("Ошибка ввода: " + e.getMessage());
         } catch (IndexOutOfBoundsException e) {
             System.out.println("Ошибка: индекс вне допустимого диапазона.");
         }
 
-        return null; // Возвращаем null в случае ошибки
+        return null;
     }
 
 }

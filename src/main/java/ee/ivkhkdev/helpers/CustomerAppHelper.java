@@ -53,14 +53,7 @@ public class CustomerAppHelper implements AppHelper<Customer> {
             System.out.println("Список клиентов пуст");
             return null;
         }
-        // Выводим список клиентов для редактирования
-        for (int i = 0; i < customers.size(); i++) {
-            System.out.printf("%d. Имя: %s, Фамилия: %s, Email: %s%n",
-                    i + 1,
-                    customers.get(i).getFirstName(),
-                    customers.get(i).getLastName(),
-                    customers.get(i).getEmail());
-        }
+        this.printList(customers);
 
         System.out.print("Введите номер клиента для редактирования: ");
         int index;
