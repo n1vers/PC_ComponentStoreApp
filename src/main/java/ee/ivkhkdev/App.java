@@ -1,24 +1,12 @@
 package ee.ivkhkdev;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.helpers.CategoryAppHelper;
-import ee.ivkhkdev.helpers.ComponentAppHelper;
-import ee.ivkhkdev.helpers.CustomerAppHelper;
 import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.input.ConsoleInput;
 import ee.ivkhkdev.interfaces.Service;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.interfaces.Repository;
 import ee.ivkhkdev.model.Purchase;
-import ee.ivkhkdev.services.CategoryService;
-import ee.ivkhkdev.services.ComponentService;
-import ee.ivkhkdev.services.CustomerService;
-import ee.ivkhkdev.repositories.Storage;
 
-import java.util.List;
-import java.util.Scanner;
 
 public class App {
     private final Input input;

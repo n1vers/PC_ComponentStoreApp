@@ -40,7 +40,7 @@ class CustomerAppHelperTest {
 
     @Test
     void create() {
-        when(inputMock.nextLine()).thenReturn("Ivan", "Ivanov", "ivanov@example.com", 40);
+        when(inputMock.nextLine()).thenReturn("Ivan", "Ivanov", "ivanov@example.com", "40");
         Customer actual = appHelperCustomer.create();
         Customer expected = new Customer("Ivan", "Ivanov", "ivanov@example.com",40);
         assertEquals(actual.getFirstName(), expected.getFirstName());
@@ -68,10 +68,11 @@ class CustomerAppHelperTest {
         customer.setFirstName("Ivan");
         customer.setLastName("Ivanov");
         customer.setEmail("ivanov@example.com");
+        customer.setCash(40);
         customers.add(customer);
 
         // Настройка для ввода данных
-        when(inputMock.nextLine()).thenReturn("1", "NewFirstName", "NewLastName", "newemail@example.com");
+        when(inputMock.nextLine()).thenReturn("1", "NewFirstName", "NewLastName", "newemail@example.com", "500.00" );
 
         // Выполняем метод update
         Customer updatedCustomer = appHelperCustomer.update(customers);
