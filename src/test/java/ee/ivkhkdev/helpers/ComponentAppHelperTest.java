@@ -4,15 +4,14 @@ import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,18 +19,19 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 class ComponentAppHelperTest {
     Input inputMock;
     AppHelper<Component> componentAppHelper;
-    Service<Category> categoryServiceMock;
+    AppService<Category> categoryAppServiceMock;
     PrintStream defaultOut = System.out;
     ByteArrayOutputStream outMock;
 
     @BeforeEach
     void setUp() {
         inputMock = Mockito.mock(Input.class);
-        categoryServiceMock = Mockito.mock(Service.class);
-        componentAppHelper = new ComponentAppHelper(inputMock, categoryServiceMock);
+        categoryAppServiceMock = Mockito.mock(AppService.class);
+        componentAppHelper = new ComponentAppHelper(inputMock, categoryAppServiceMock);
         outMock = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outMock));
     }
@@ -39,7 +39,7 @@ class ComponentAppHelperTest {
     @AfterEach
     void tearDown() {
         inputMock = null;
-        categoryServiceMock = null;
+        categoryAppServiceMock = null;
         componentAppHelper = null;
         System.setOut(defaultOut);
         outMock = null;
@@ -55,7 +55,7 @@ class ComponentAppHelperTest {
         category.setCategoryName("Видеокарты");
         List<Category> categories = new ArrayList<>();
         categories.add(category);
-        when(categoryServiceMock.list()).thenReturn(categories);
+        when(categoryAppServiceMock.list()).thenReturn(categories);
 
         // Выполняем метод create
         Component actual = componentAppHelper.create();
@@ -134,7 +134,7 @@ class ComponentAppHelperTest {
         category2.setCategoryName("Category 2");
 
         // Настройка категорий
-        when(categoryServiceMock.list()).thenReturn(List.of(category1, category2));
+        when(categoryAppServiceMock.list()).thenReturn(List.of(category1, category2));
 
         // Настройка ввода
         when(inputMock.nextLine()).thenReturn("1") // Выбор компонента
@@ -232,7 +232,7 @@ class ComponentAppHelperTest {
         category.setCategoryName("Category");
         List<Category> categories = new ArrayList<>();
         categories.add(category);
-        when(categoryServiceMock.list()).thenReturn(categories);
+        when(categoryAppServiceMock.list()).thenReturn(categories);
 
         // Выполняем метод update
         Component updatedComponent = componentAppHelper.update(components);

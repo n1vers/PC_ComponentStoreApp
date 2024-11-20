@@ -1,30 +1,39 @@
 package ee.ivkhkdev;
 
 import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
 import ee.ivkhkdev.model.Purchase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-
-public class App {
+@SpringBootApplication
+public class App implements CommandLineRunner {
     private final Input input;
-    private final Service<Category> categoryService;
-    private final Service<Component> componentService;
-    private final Service<Customer> customerService;
-    private final Service<Purchase> purchaseService;
+    private final AppService<Category> categoryAppService;
+    private final AppService<Component> componentAppService;
+    private final AppService<Customer> customerAppService;
+    private final AppService<Purchase> purchaseAppService;
 
-    public App(Input input, Service<Category> categoryService, Service<Component> componentService,
-               Service<Customer> customerService, Service<Purchase> purchaseService) {
+    @Autowired
+    public App(Input input, AppService<Category> categoryAppService, AppService<Component> componentAppService,
+               AppService<Customer> customerAppService, AppService<Purchase> purchaseAppService) {
         this.input = input;
-        this.categoryService = categoryService;
-        this.componentService = componentService;
-        this.customerService = customerService;
-        this.purchaseService = purchaseService;
+        this.categoryAppService = categoryAppService;
+        this.componentAppService = componentAppService;
+        this.customerAppService = customerAppService;
+        this.purchaseAppService = purchaseAppService;
+    }
+    public static void main(String[] args) {
+        SpringApplication.run(App.class,args);
     }
 
-    public void run() {
+    @Override
+    public void run(String... args) throws Exception {
         boolean repeat = true;
         System.out.println("======= PC Component Store =========");
         do {
@@ -48,64 +57,64 @@ public class App {
                     repeat = false;
                     break;
                 case 1:
-                    if (componentService.add()) {
+                    if (componentAppService.add()) {
                         System.out.println("Компонент добавлен");
                     } else {
                         System.out.println("Не удалось добавить компонент");
                     }
                     break;
                 case 2:
-                    if (componentService.print()) {
+                    if (componentAppService.print()) {
                         System.out.println("-----------Конец списка---------");
                     }
                     break;
                 case 3:
-                    if (componentService.edit()){
+                    if (componentAppService.edit()){
                         System.out.println("Товар успешно изменен");
                     }  else{
                         System.out.println("Товар изменить не удалось");
                     }
                     break;
                 case 4:
-                    if (customerService.add()) {
+                    if (customerAppService.add()) {
                         System.out.println("Клиент добавлен");
                     } else {
                         System.out.println("Не удалось добавить клиента");
                     }
                     break;
                 case 5:
-                    if (customerService.print()) {
+                    if (customerAppService.print()) {
                         System.out.println("-----------Конец списка---------");
                     }
                     break;
                 case 6:
-                    if (customerService.edit()) {
+                    if (customerAppService.edit()) {
                         System.out.println("Клиент успешно изменен");
                     } else {
                         System.out.println("Клиента изменить не удалось");
                     }
                     break;
                 case 7:
-                    if (categoryService.add()) {
+                    if (categoryAppService.add()) {
                         System.out.println("Категория добавлена");
                     } else {
                         System.out.println("Не удалось добавить категорию");
                     }
                     break;
                 case 8:
-                    if (categoryService.print()) {
+                    if (categoryAppService.print()) {
                         System.out.println("-----------Конец списка категорий---------");
                     }
                     break;
                 case 9:
-                    if (purchaseService.add()) {
+                    if (purchaseAppService.add()) {
                         System.out.println("Товар куплен");
                     } else {
                         System.out.println("Не удалось купить товар");
                     }
                     break;
                 case 10:
-                    if (purchaseService.print()) {
+                    if (purchaseAppService.print()) {
                         System.out.println("-----------Конец списка купленных товаров---------");
                     }
                     break;

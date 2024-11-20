@@ -2,10 +2,11 @@ package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.model.Category;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
@@ -14,20 +15,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-public class CategoryServiceTest {
+@SpringBootTest
+public class CategoryAppServiceTest {
 
-    private CategoryService categoryService;
-    private Repository<Category> mockRepository;
+    private CategoryAppService categoryService;
+    private AppRepository<Category> mockAppRepository;
     private AppHelper<Category> mockAppHelperCategory;
 
     @BeforeEach
     void setUp() {
         // Создаем моки для зависимостей
-        mockRepository = Mockito.mock(Repository.class);
+        mockAppRepository = Mockito.mock(AppRepository.class);
         mockAppHelperCategory = Mockito.mock(AppHelper.class);
 
         // Инициализируем CategoryService с моками
-        categoryService = new CategoryService(mockRepository, mockAppHelperCategory);
+        categoryService = new CategoryAppService(mockAppRepository, mockAppHelperCategory);
     }
 
     @Test
@@ -41,7 +43,7 @@ public class CategoryServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).save(mockCategory); // Убедиться, что метод save был вызван один раз
+        verify(mockAppRepository, times(1)).save(mockCategory); // Убедиться, что метод save был вызван один раз
     }
 
     @Test
@@ -54,7 +56,7 @@ public class CategoryServiceTest {
 
         // Проверка
         assertFalse(result);
-        verify(mockRepository, never()).save(any()); // Убедиться, что метод save не был вызван
+        verify(mockAppRepository, never()).save(any()); // Убедиться, что метод save не был вызван
     }
 
     @Test
@@ -62,7 +64,7 @@ public class CategoryServiceTest {
         // Подготовка: создать категорию и выбросить исключение при вызове save
         Category mockCategory = new Category();
         when(mockAppHelperCategory.create()).thenReturn(mockCategory);
-        doThrow(new RuntimeException("Save error")).when(mockRepository).save(mockCategory);
+        doThrow(new RuntimeException("Save error")).when(mockAppRepository).save(mockCategory);
 
         // Выполняем метод add
         boolean result = categoryService.add();
@@ -75,7 +77,7 @@ public class CategoryServiceTest {
     void testPrint() {
         // Подготовка: создать список категорий и настроить заглушки
         List<Category> mockCategoryList = List.of(new Category(), new Category());
-        when(mockRepository.load()).thenReturn(mockCategoryList);
+        when(mockAppRepository.load()).thenReturn(mockCategoryList);
         when(mockAppHelperCategory.printList(mockCategoryList)).thenReturn(true);
 
         // Выполняем метод print
@@ -83,7 +85,7 @@ public class CategoryServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
         verify(mockAppHelperCategory, times(1)).printList(mockCategoryList); // Убедиться, что метод printList был вызван один раз
     }
 
@@ -91,13 +93,13 @@ public class CategoryServiceTest {
     void testList() {
         // Подготовка: создать список категорий и настроить заглушки
         List<Category> mockCategoryList = List.of(new Category(), new Category());
-        when(mockRepository.load()).thenReturn(mockCategoryList);
+        when(mockAppRepository.load()).thenReturn(mockCategoryList);
 
         // Выполняем метод list
         List<Category> result = categoryService.list();
 
         // Проверка
         assertEquals(mockCategoryList, result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
 }

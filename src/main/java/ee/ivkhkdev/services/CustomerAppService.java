@@ -1,20 +1,20 @@
 package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 
 import java.util.List;
 
-public class CustomerService implements Service<Customer> {
+public class CustomerAppService implements AppService<Customer> {
 
-    private Repository<Customer> repository;
+    private AppRepository<Customer> appRepository;
     private AppHelper<Customer> appHelperCustomer;
 
-    public CustomerService(Repository<Customer> repository, AppHelper<Customer> appHelperCustomer) {
+    public CustomerAppService(AppRepository<Customer> appRepository, AppHelper<Customer> appHelperCustomer) {
 
-        this.repository = repository;
+        this.appRepository = appRepository;
         this.appHelperCustomer = appHelperCustomer;
     }
 
@@ -23,7 +23,7 @@ public class CustomerService implements Service<Customer> {
         Customer customer = appHelperCustomer.create();
         if (customer == null) return false;
         try {
-            repository.save(customer);
+            appRepository.save(customer);
             return true;
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -33,16 +33,16 @@ public class CustomerService implements Service<Customer> {
 
     @Override
     public boolean print() {
-        return appHelperCustomer.printList(repository.load());
+        return appHelperCustomer.printList(appRepository.load());
     }
 
     public List<Customer> list() {
-        return repository.load();
+        return appRepository.load();
     }
 
     @Override
     public boolean edit() {
-        List<Customer> customers = repository.load();
+        List<Customer> customers = appRepository.load();
         Customer updatedCustomer = appHelperCustomer.update(customers);
         if (updatedCustomer == null) {
             return false;
@@ -50,7 +50,7 @@ public class CustomerService implements Service<Customer> {
         try {
             int index = customers.indexOf(updatedCustomer);
             if (index != -1) {
-                repository.update(index, updatedCustomer);
+                appRepository.update(index, updatedCustomer);
                 return true;
             } else {
                 System.out.println("Клиент не найден в списке.");

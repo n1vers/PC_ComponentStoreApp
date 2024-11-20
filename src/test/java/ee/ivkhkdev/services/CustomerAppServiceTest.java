@@ -2,10 +2,11 @@ package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,20 +15,21 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CustomerServiceTest {
+@SpringBootTest
+class CustomerAppServiceTest {
 
-    private CustomerService customerService;
-    private Repository<Customer> mockRepository;
+    private CustomerAppService customerService;
+    private AppRepository<Customer> mockAppRepository;
     private AppHelper<Customer> mockAppHelperCustomer;
 
     @BeforeEach
     void setUp() {
         // Создаем моки для зависимостей
-        mockRepository = Mockito.mock(Repository.class);
+        mockAppRepository = Mockito.mock(AppRepository.class);
         mockAppHelperCustomer = Mockito.mock(AppHelper.class);
 
         // Инициализируем CustomerService с моками
-        customerService = new CustomerService(mockRepository, mockAppHelperCustomer);
+        customerService = new CustomerAppService(mockAppRepository, mockAppHelperCustomer);
     }
 
     @Test
@@ -41,7 +43,7 @@ class CustomerServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).save(mockCustomer); // Убедиться, что метод save был вызван один раз
+        verify(mockAppRepository, times(1)).save(mockCustomer); // Убедиться, что метод save был вызван один раз
     }
 
     @Test
@@ -54,7 +56,7 @@ class CustomerServiceTest {
 
         // Проверка
         assertFalse(result);
-        verify(mockRepository, never()).save(any()); // Убедиться, что метод save не был вызван
+        verify(mockAppRepository, never()).save(any()); // Убедиться, что метод save не был вызван
     }
 
     @Test
@@ -62,7 +64,7 @@ class CustomerServiceTest {
         // Подготовка: создать клиента и выбросить исключение при вызове save
         Customer mockCustomer = new Customer();
         when(mockAppHelperCustomer.create()).thenReturn(mockCustomer);
-        doThrow(new RuntimeException("Save error")).when(mockRepository).save(mockCustomer);
+        doThrow(new RuntimeException("Save error")).when(mockAppRepository).save(mockCustomer);
 
         // Выполняем метод add
         boolean result = customerService.add();
@@ -75,7 +77,7 @@ class CustomerServiceTest {
     void testPrint() {
         // Подготовка: создать список клиентов и настроить заглушки
         List<Customer> mockCustomerList = List.of(new Customer(), new Customer());
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
         when(mockAppHelperCustomer.printList(mockCustomerList)).thenReturn(true);
 
         // Выполняем метод print
@@ -83,7 +85,7 @@ class CustomerServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
         verify(mockAppHelperCustomer, times(1)).printList(mockCustomerList); // Убедиться, что метод printList был вызван один раз
     }
 
@@ -91,14 +93,14 @@ class CustomerServiceTest {
     void testList() {
         // Подготовка: создать список клиентов и настроить заглушки
         List<Customer> mockCustomerList = List.of(new Customer(), new Customer());
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
 
         // Выполняем метод list
         List<Customer> result = customerService.list();
 
         // Проверка
         assertEquals(mockCustomerList, result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
 
     @Test
@@ -113,7 +115,7 @@ class CustomerServiceTest {
         // Настройка: возвращаем список клиентов из репозитория
         List<Customer> mockCustomerList = new ArrayList<>();
         mockCustomerList.add(existingCustomer);
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
 
         // Обновленный клиент, который вернется из хелпера
         // Используем тот же объект, чтобы гарантировать, что equals будет работать
@@ -130,10 +132,10 @@ class CustomerServiceTest {
         assertTrue(result, "Expected edit to return true");
 
         // Проверка: метод update должен быть вызван с правильным индексом
-        verify(mockRepository, times(1)).update(0, updatedCustomer);
+        verify(mockAppRepository, times(1)).update(0, updatedCustomer);
 
         // Дополнительная проверка: убедиться, что обновленный клиент совпадает с ожидаемым
-        List<Customer> updatedList = mockRepository.load();
+        List<Customer> updatedList = mockAppRepository.load();
         assertEquals(1, updatedList.size());
         assertEquals(updatedCustomer.getEmail(), updatedList.get(0).getEmail());
     }
@@ -145,7 +147,7 @@ class CustomerServiceTest {
     void testEditCustomerFailureWhenUpdatedCustomerIsNull() {
         // Настроить заглушку, чтобы update возвращал null
         List<Customer> mockCustomerList = List.of(new Customer());
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
         when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(null);
 
         // Выполняем метод edit
@@ -153,7 +155,7 @@ class CustomerServiceTest {
 
         // Проверка
         assertFalse(result);
-        verify(mockRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+        verify(mockAppRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
     }
 
     @Test
@@ -163,7 +165,7 @@ class CustomerServiceTest {
         Customer updatedCustomer = new Customer(); // Этот клиент не будет найден
 
         List<Customer> mockCustomerList = List.of(existingCustomer);
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
         when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
 
         // Выполняем метод edit
@@ -171,7 +173,7 @@ class CustomerServiceTest {
 
         // Проверка
         assertFalse(result);
-        verify(mockRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
+        verify(mockAppRepository, never()).update(anyInt(), any()); // Убедиться, что метод update не был вызван
     }
 
     @Test
@@ -181,11 +183,11 @@ class CustomerServiceTest {
         Customer updatedCustomer = new Customer();
 
         List<Customer> mockCustomerList = List.of(existingCustomer);
-        when(mockRepository.load()).thenReturn(mockCustomerList);
+        when(mockAppRepository.load()).thenReturn(mockCustomerList);
         when(mockAppHelperCustomer.update(mockCustomerList)).thenReturn(updatedCustomer);
 
         // Настройка: выбросить исключение при вызове update
-        doThrow(new RuntimeException("Update error")).when(mockRepository).update(anyInt(), eq(updatedCustomer));
+        doThrow(new RuntimeException("Update error")).when(mockAppRepository).update(anyInt(), eq(updatedCustomer));
 
         // Выполняем метод edit
         boolean result = customerService.edit();

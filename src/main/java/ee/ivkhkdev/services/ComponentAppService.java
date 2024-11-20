@@ -1,19 +1,19 @@
 package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 
 import java.util.List;
 
-public class ComponentService implements Service<Component> {
+public class ComponentAppService implements AppService<Component> {
 
-    private Repository<Component> repository;
+    private AppRepository<Component> appRepository;
     private AppHelper<Component> appHelperComponent;
 
-    public ComponentService(Repository<Component> repository, AppHelper<Component> apphelperComponent) {
-        this.repository = repository;
+    public ComponentAppService(AppRepository<Component> appRepository, AppHelper<Component> apphelperComponent) {
+        this.appRepository = appRepository;
         this.appHelperComponent = apphelperComponent;
     }
 
@@ -22,7 +22,7 @@ public class ComponentService implements Service<Component> {
         Component component = appHelperComponent.create();
         if(component == null) return false;
         try {
-            repository.save(component);
+            appRepository.save(component);
             return true;
         }catch (Exception e) {
             System.out.println("Ошибка: " + e.toString());
@@ -32,23 +32,23 @@ public class ComponentService implements Service<Component> {
 
     @Override
     public boolean print(){
-        return appHelperComponent.printList(repository.load());
+        return appHelperComponent.printList(appRepository.load());
     }
 
     @Override
     public List<Component> list() {
-        return repository.load();
+        return appRepository.load();
     }
 
     @Override
     public boolean edit(){
-        List<Component> components = repository.load();
+        List<Component> components = appRepository.load();
         Component updateComponent = appHelperComponent.update(components);
         if(updateComponent == null) return false;
         try {
             int index = components.indexOf(updateComponent);
             if (index != -1) {
-                repository.update(index, updateComponent);
+                appRepository.update(index, updateComponent);
                 return true;
             } else {
                 System.out.println("Компонент не найден в списке.");

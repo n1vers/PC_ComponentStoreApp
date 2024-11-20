@@ -1,7 +1,7 @@
 package ee.ivkhkdev.helpers;
 
 import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
 import ee.ivkhkdev.model.Purchase;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -18,12 +19,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 public class PurchaseAppHelperTest {
 
     private PurchaseAppHelper purchaseAppHelper;
     private Input mockInput;
-    private Service<Component> mockComponentService;
-    private Service<Customer> mockCustomerService;
+    private AppService<Component> mockComponentAppService;
+    private AppService<Customer> mockCustomerAppService;
 
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outMock;
@@ -31,11 +33,11 @@ public class PurchaseAppHelperTest {
     void setUp() {
         // Создаем моки для зависимостей
         mockInput = Mockito.mock(Input.class);
-        mockComponentService = Mockito.mock(Service.class);
-        mockCustomerService = Mockito.mock(Service.class);
+        mockComponentAppService = Mockito.mock(AppService.class);
+        mockCustomerAppService = Mockito.mock(AppService.class);
 
         // Инициализируем PurchaseAppHelper с моками
-        purchaseAppHelper = new PurchaseAppHelper(mockInput, mockComponentService, mockCustomerService);
+        purchaseAppHelper = new PurchaseAppHelper(mockInput, mockComponentAppService, mockCustomerAppService);
         outMock = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outMock));
     }
@@ -56,11 +58,11 @@ public class PurchaseAppHelperTest {
         mockCustomer.setFirstName("Ivan");
         mockCustomer.setLastName("Ivanov");
 
-        when(mockComponentService.print()).thenReturn(true);
-        when(mockComponentService.list()).thenReturn(List.of(mockComponent));
+        when(mockComponentAppService.print()).thenReturn(true);
+        when(mockComponentAppService.list()).thenReturn(List.of(mockComponent));
         when(mockInput.nextLine()).thenReturn("1"); // Выбор компонента
-        when(mockCustomerService.print()).thenReturn(true);
-        when(mockCustomerService.list()).thenReturn(List.of(mockCustomer));
+        when(mockCustomerAppService.print()).thenReturn(true);
+        when(mockCustomerAppService.list()).thenReturn(List.of(mockCustomer));
         when(mockInput.nextLine()).thenReturn("1"); // Выбор покупателя
 
         // Выполнение метода create
@@ -76,7 +78,7 @@ public class PurchaseAppHelperTest {
     @Test
     void testCreateComponentServicePrintFails() {
         // Настройка моков, чтобы componentService.print() вернул false
-        when(mockComponentService.print()).thenReturn(false);
+        when(mockComponentAppService.print()).thenReturn(false);
 
         // Выполнение метода create
         Purchase result = purchaseAppHelper.create();
@@ -93,10 +95,10 @@ public class PurchaseAppHelperTest {
         mockComponent.setModel("ROG Strix");
         mockComponent.setPrice(15000);
 
-        when(mockComponentService.print()).thenReturn(true);
-        when(mockComponentService.list()).thenReturn(List.of(mockComponent));
+        when(mockComponentAppService.print()).thenReturn(true);
+        when(mockComponentAppService.list()).thenReturn(List.of(mockComponent));
         when(mockInput.nextLine()).thenReturn("1"); // Выбор компонента
-        when(mockCustomerService.print()).thenReturn(false);
+        when(mockCustomerAppService.print()).thenReturn(false);
 
         // Выполнение метода create
         Purchase result = purchaseAppHelper.create();

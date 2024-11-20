@@ -4,7 +4,7 @@ import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.interfaces.Input;
 import ee.ivkhkdev.model.Category;
 import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 
 import java.util.List;
 import java.util.Locale;
@@ -12,11 +12,11 @@ import java.util.Locale;
 public class ComponentAppHelper implements AppHelper<Component> {
 
     private final Input input;
-    private final Service<Category> categoryService;
+    private final AppService<Category> categoryAppService;
 
-    public ComponentAppHelper(Input input, Service<Category> categoryService) {
+    public ComponentAppHelper(Input input, AppService<Category> categoryAppService) {
         this.input = input;
-        this.categoryService = categoryService;
+        this.categoryAppService = categoryAppService;
     }
 
     @Override
@@ -27,13 +27,13 @@ public class ComponentAppHelper implements AppHelper<Component> {
             component.setBrand(input.nextLine());
 
             System.out.println("Список категорий:");
-            List<Category> categories = categoryService.list();
+            List<Category> categories = categoryAppService.list();
             for (int i = 0; i < categories.size(); i++) {
                 System.out.printf("%d. %s%n", i + 1, categories.get(i).getCategoryName());
             }
             System.out.printf("Выберите номер категории из списка: ");
             int numberCategory = Integer.parseInt(input.nextLine());
-            component.getCategory().add(categoryService.list().get(numberCategory - 1));
+            component.getCategory().add(categoryAppService.list().get(numberCategory - 1));
 
             System.out.print("Введите модель компонента: ");
             component.setModel(input.nextLine());
@@ -102,7 +102,7 @@ public class ComponentAppHelper implements AppHelper<Component> {
             }
 
             System.out.println("Текущие категории:");
-            List<Category> categories = categoryService.list();
+            List<Category> categories = categoryAppService.list();
             for (int i = 0; i < categories.size(); i++) {
                 System.out.printf("%d. %s%n", i + 1, categories.get(i).getCategoryName());
             }
@@ -110,9 +110,9 @@ public class ComponentAppHelper implements AppHelper<Component> {
             System.out.print("Хотите создать новую категорию? (y/n): ");
             String createNewCategory = input.nextLine();
             if (createNewCategory.equalsIgnoreCase("y")) {
-                boolean success = categoryService.add();
+                boolean success = categoryAppService.add();
                 if (success) {
-                    Category newCategory = categoryService.list().get(categoryService.list().size() - 1);
+                    Category newCategory = categoryAppService.list().get(categoryAppService.list().size() - 1);
                     component.getCategory().clear();
                     component.getCategory().add(newCategory);
                 } else {

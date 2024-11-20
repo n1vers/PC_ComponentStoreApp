@@ -2,8 +2,7 @@ package ee.ivkhkdev.helpers;
 
 import ee.ivkhkdev.interfaces.AppHelper;
 import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.interfaces.Repository;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Component;
 import ee.ivkhkdev.model.Customer;
 import ee.ivkhkdev.model.Purchase;
@@ -14,30 +13,30 @@ import java.util.Locale;
 
 public class PurchaseAppHelper implements AppHelper<Purchase> {
     private final Input input;
-    private final Service<Component> componentService;
-    private final Service<Customer> customerService;
+    private final AppService<Component> componentAppService;
+    private final AppService<Customer> customerAppService;
 
-    public PurchaseAppHelper(Input input, Service<Component> componentService, Service<Customer> customerService) {
+    public PurchaseAppHelper(Input input, AppService<Component> componentAppService, AppService<Customer> customerAppService) {
         this.input = input;
-        this.componentService = componentService;
-        this.customerService = customerService;
+        this.componentAppService = componentAppService;
+        this.customerAppService = customerAppService;
     }
 
     @Override
     public Purchase create() {
-        if (!componentService.print()) {
+        if (!componentAppService.print()) {
             return null;
         }
         System.out.print("Выберите номер компонента для покупки: ");
         int componentNumber = Integer.parseInt(input.nextLine());
-        Component component = componentService.list().get(componentNumber - 1);
+        Component component = componentAppService.list().get(componentNumber - 1);
 
-        if (!customerService.print()) {
+        if (!customerAppService.print()) {
             return null;
         }
         System.out.print("Выберите номер покупателя: ");
         int customerNumber = Integer.parseInt(input.nextLine());
-        Customer customer = customerService.list().get(customerNumber - 1);
+        Customer customer = customerAppService.list().get(customerNumber - 1);
 
 //        double newBalance = customer.getCash() - component.getPrice();
 //        if (newBalance < 0) {

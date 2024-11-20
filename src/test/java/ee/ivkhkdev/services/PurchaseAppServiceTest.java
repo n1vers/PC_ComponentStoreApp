@@ -1,31 +1,33 @@
 package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 import ee.ivkhkdev.model.Purchase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class PurchaseServiceTest {
+@SpringBootTest
+class PurchaseAppServiceTest {
 
-    private PurchaseService purchaseService;
+    private PurchaseAppService purchaseService;
     private AppHelper<Purchase> mockPurchaseAppHelper;
-    private Repository<Purchase> mockRepository;
+    private AppRepository<Purchase> mockAppRepository;
 
     @BeforeEach
     void setUp() {
         // Создаем моки для зависимостей
         mockPurchaseAppHelper = Mockito.mock(AppHelper.class);
-        mockRepository = Mockito.mock(Repository.class);
+        mockAppRepository = Mockito.mock(AppRepository.class);
 
         // Инициализируем PurchaseService с моками
-        purchaseService = new PurchaseService(mockPurchaseAppHelper, mockRepository);
+        purchaseService = new PurchaseAppService(mockPurchaseAppHelper, mockAppRepository);
     }
 
     @Test
@@ -39,7 +41,7 @@ class PurchaseServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).save(mockPurchase); // Убедиться, что метод save был вызван один раз
+        verify(mockAppRepository, times(1)).save(mockPurchase); // Убедиться, что метод save был вызван один раз
     }
 
     @Test
@@ -52,7 +54,7 @@ class PurchaseServiceTest {
 
         // Проверка
         assertFalse(result);
-        verify(mockRepository, never()).save(any()); // Убедиться, что метод save не был вызван
+        verify(mockAppRepository, never()).save(any()); // Убедиться, что метод save не был вызван
     }
 
     @Test
@@ -60,7 +62,7 @@ class PurchaseServiceTest {
         // Подготовка: создать Purchase и выбросить исключение при вызове save
         Purchase mockPurchase = new Purchase();
         when(mockPurchaseAppHelper.create()).thenReturn(mockPurchase);
-        doThrow(new RuntimeException("Save error")).when(mockRepository).save(mockPurchase);
+        doThrow(new RuntimeException("Save error")).when(mockAppRepository).save(mockPurchase);
 
         // Выполняем метод add
         boolean result = purchaseService.add();
@@ -73,7 +75,7 @@ class PurchaseServiceTest {
     void testPrint() {
         // Подготовка: создать список покупок и настроить заглушки
         List<Purchase> mockPurchaseList = List.of(new Purchase());
-        when(mockRepository.load()).thenReturn(mockPurchaseList);
+        when(mockAppRepository.load()).thenReturn(mockPurchaseList);
         when(mockPurchaseAppHelper.printList(mockPurchaseList)).thenReturn(true);
 
         // Выполняем метод print
@@ -81,7 +83,7 @@ class PurchaseServiceTest {
 
         // Проверка
         assertTrue(result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
         verify(mockPurchaseAppHelper, times(1)).printList(mockPurchaseList); // Убедиться, что метод printList был вызван один раз
     }
 
@@ -89,13 +91,13 @@ class PurchaseServiceTest {
     void testList() {
         // Подготовка: создать список покупок и настроить заглушки
         List<Purchase> mockPurchaseList = List.of(new Purchase());
-        when(mockRepository.load()).thenReturn(mockPurchaseList);
+        when(mockAppRepository.load()).thenReturn(mockPurchaseList);
 
         // Выполняем метод list
         List<Purchase> result = purchaseService.list();
 
         // Проверка
         assertEquals(mockPurchaseList, result);
-        verify(mockRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
+        verify(mockAppRepository, times(1)).load(); // Убедиться, что метод load был вызван один раз
     }
 }

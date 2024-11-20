@@ -1,19 +1,19 @@
 package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Repository;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppRepository;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Purchase;
 
 import java.util.List;
 
-public class PurchaseService implements Service<Purchase> {
+public class PurchaseAppService implements AppService<Purchase> {
     private final AppHelper<Purchase> purchaseAppHelper;
-    private final Repository<Purchase> repository;
+    private final AppRepository<Purchase> appRepository;
 
-    public PurchaseService(AppHelper<Purchase> purchaseAppHelper, Repository<Purchase> repository) {
+    public PurchaseAppService(AppHelper<Purchase> purchaseAppHelper, AppRepository<Purchase> appRepository) {
         this.purchaseAppHelper = purchaseAppHelper;
-        this.repository = repository;
+        this.appRepository = appRepository;
     }
 
     @Override
@@ -21,7 +21,7 @@ public class PurchaseService implements Service<Purchase> {
         Purchase purchase = purchaseAppHelper.create();
         if (purchase == null) return false;
         try {
-            repository.save(purchase);
+            appRepository.save(purchase);
             return true;
         } catch (Exception e) {
             System.out.println("Ошибка при добавлении покупки: " + e.getMessage());
@@ -31,12 +31,12 @@ public class PurchaseService implements Service<Purchase> {
 
     @Override
     public boolean print() {
-        return purchaseAppHelper.printList(repository.load());
+        return purchaseAppHelper.printList(appRepository.load());
     }
 
     @Override
     public List<Purchase> list() {
-        return repository.load();
+        return appRepository.load();
     }
 
     @Override

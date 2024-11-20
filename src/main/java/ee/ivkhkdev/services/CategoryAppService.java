@@ -1,19 +1,19 @@
 package ee.ivkhkdev.services;
 
 import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Service;
+import ee.ivkhkdev.interfaces.AppService;
 import ee.ivkhkdev.model.Category;
-import ee.ivkhkdev.interfaces.Repository;
+import ee.ivkhkdev.interfaces.AppRepository;
 
 import java.util.List;
 
-public class CategoryService  implements Service<Category> {
+public class CategoryAppService implements AppService<Category> {
 
-    private Repository<Category> repository;
+    private AppRepository<Category> appRepository;
     private AppHelper<Category> appHelperCategory;
 
-    public CategoryService( Repository<Category> repository, AppHelper<Category> appHelperCategory) {
-        this.repository = repository;
+    public CategoryAppService(AppRepository<Category> appRepository, AppHelper<Category> appHelperCategory) {
+        this.appRepository = appRepository;
         this.appHelperCategory = appHelperCategory;
     }
 
@@ -22,7 +22,7 @@ public class CategoryService  implements Service<Category> {
         Category category = appHelperCategory.create();
         if (category == null) return false;
         try {
-            repository.save(category);
+            appRepository.save(category);
             return true;
         }catch (Exception e) {
             System.out.println("Ошибка: " + e.toString());
@@ -32,12 +32,12 @@ public class CategoryService  implements Service<Category> {
 
     @Override
     public boolean print(){
-        return appHelperCategory.printList(repository.load());
+        return appHelperCategory.printList(appRepository.load());
     }
 
     @Override
     public List<Category> list(){
-        return repository.load();
+        return appRepository.load();
     }
 
     @Override
