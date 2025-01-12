@@ -1,5 +1,6 @@
 package ee.ivkhkdev.services;
 
+import ee.ivkhkdev.helpers.ComponentHelper;
 import ee.ivkhkdev.helpers.Helper;
 import ee.ivkhkdev.entity.Component;
 import ee.ivkhkdev.repositories.ComponentRepository;
@@ -12,52 +13,48 @@ import java.util.Optional;
 
 @Service
 public class ComponentAppService implements AppService<Component> {
+
+    private final ComponentRepository componentRepository;
+    private final ComponentHelper componentHelper;
+
     @Autowired
-    private ComponentRepository componentRepository;
-    @Autowired
-    private Helper<Component> helperComponent;
-
-    @Override
-    public boolean add(){
-        try {
-            Optional<Component> component = helperComponent.create();
-            if (component.isPresent()) {
-                componentRepository.save(component.get());
-                return true;
-            }
-        }catch (Exception e) {
-            System.out.println("Ошибка: " + e.getMessage());
-        }
-        return false;
+    public ComponentAppService(ComponentRepository componentRepository, ComponentHelper componentHelper) {
+        this.componentRepository = componentRepository;
+        this.componentHelper = componentHelper;
     }
 
     @Override
-    public boolean print(){
-        return helperComponent.printList();
-    }
-
-    @Override
-    public List<Component> list() {
-        return componentRepository.findAll();
-    }
-
-    @Override
-    public boolean edit(){
-        List<Component> components = appRepository.load();
-        Component updateComponent = helperComponent.update(components);
-        if(updateComponent == null) return false;
-        try {
-            int index = components.indexOf(updateComponent);
-            if (index != -1) {
-                appRepository.update(index, updateComponent);
-                return true;
-            } else {
-                System.out.println("Компонент не найден в списке.");
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка при обновлении компонента: " + e.getMessage());
+    public boolean add() {
+        Optional<Component> optionalComponent = componentHelper.create();
+        if (optionalComponent.isEmpty()) {
             return false;
         }
+        componentRepository.save(optionalComponent.get());
+        return true;
+    }
+
+    @Override
+    public boolean print() {
+        return componentHelper.printList(componentRepository.findAll(), true);
+    }
+
+    @Override
+    public boolean edit() {
+        Optional<Component> optionalModifyComponent = getComponentForModify();
+        if (optionalModifyComponent.isEmpty()) {
+            return false;
+        }
+        Optional<Component> optionalModifiedComponent = componentHelper.update(optionalModifyComponent.get());
+        componentRepository.save(optionalModifiedComponent.get());
+        return true;
+    }
+
+    private Optional<Component> getComponentForModify() {
+        Optional<Long> optionalComponentId = componentHelper.getIdModifyComponent(componentRepository.findAll(), true);
+        if (optionalComponentId.isEmpty()) {
+            return Optional.empty();
+        }
+        return componentRepository.findById(optionalComponentId.get());
     }
 }
+

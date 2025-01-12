@@ -11,37 +11,33 @@ import java.util.Optional;
 
 @Service
 public class CategoryAppService implements AppService<Category> {
+
+    private final Helper<Category> helperCategory;
+    private final CategoryRepository categoryRepository;
+
     @Autowired
-    private CategoryRepository categoryRepository;
-    @Autowired
-    private Helper<Category> helperCategory;
+    public CategoryAppService(Helper<Category> helperCategory, CategoryRepository categoryRepository) {
+        this.helperCategory = helperCategory;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
-    public boolean add(){
-        try {
-            Optional<Category> category = helperCategory.create();
-            if (category.isPresent()) {
-                categoryRepository.save(category.get());
-                return true;
-            }
-        }catch (Exception e){
-            System.out.println("Error: "+e.getMessage());
+    public boolean add() {
+        Optional<Category> optionalCategory = helperCategory.create();
+        if (optionalCategory.isEmpty()) {
+            return false;
         }
-        return false;
+        categoryRepository.save(optionalCategory.get());
+        return true;
     }
 
     @Override
-    public boolean print(){
-        return helperCategory.printList();
+    public boolean print() {
+        return helperCategory.printList(categoryRepository.findAll(), true);
     }
 
     @Override
-    public List<Category> list(){
-        return categoryRepository.findAll();
-    }
-
-    @Override
-    public boolean edit(){
-        return false;
+    public boolean edit() {
+       return false;
     }
 }

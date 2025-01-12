@@ -6,42 +6,37 @@ import ee.ivkhkdev.repositories.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PurchaseAppService implements AppService<Purchase> {
+
+    private final Helper<Purchase> purchaseHelper;
+    private final PurchaseRepository purchaseRepository;
+
     @Autowired
-    private  Helper<Purchase> purchaseHelper;
-    @Autowired
-    private PurchaseRepository purchaseRepository;
+    public PurchaseAppService(Helper<Purchase> purchaseHelper, PurchaseRepository purchaseRepository) {
+        this.purchaseHelper = purchaseHelper;
+        this.purchaseRepository = purchaseRepository;
+    }
 
     @Override
     public boolean add() {
-        try {
-            Optional<Purchase> purchase = purchaseHelper.create();
-            if (purchase.isPresent()) {
-                purchaseRepository.save(purchase.get());
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка при добавлении покупки: " + e.getMessage());
+        Optional<Purchase> optionalPurchase = purchaseHelper.create();
+        if (optionalPurchase.isEmpty()) {
+            return false;
         }
-        return false;
+        purchaseRepository.save(optionalPurchase.get());
+        return true;
     }
 
     @Override
     public boolean print() {
-        return purchaseHelper.printList();
+        return purchaseHelper.printList(purchaseRepository.findAll(), true);
     }
 
     @Override
-    public List<Purchase> list() {
-        return purchaseRepository.findAll();
-    }
-
-    @Override
-    public boolean edit(){
+    public boolean edit() {
         return false;
     }
 }

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 @Entity
-public class Customer {
+public class Customer implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

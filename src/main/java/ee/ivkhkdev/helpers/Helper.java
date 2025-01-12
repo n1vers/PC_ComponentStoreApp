@@ -5,6 +5,6 @@ import java.util.Optional;
 
 public interface Helper<T> {
     Optional<T> create();
-    boolean printList();
-    boolean update(T t);
+    Optional<T> update(T t);
+    boolean printList(List<T> ts,boolean enableAll);
 }

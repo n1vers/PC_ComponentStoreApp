@@ -1,58 +1,58 @@
 package ee.ivkhkdev.services;
 
+import ee.ivkhkdev.helpers.CustomerHelper;
 import ee.ivkhkdev.helpers.Helper;
 import ee.ivkhkdev.entity.Customer;
 import ee.ivkhkdev.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CustomerAppService implements AppService<Customer> {
+
+    private final CustomerRepository customerRepository;
+    private final CustomerHelper customerHelper;
+
     @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private Helper<Customer> helperCustomer;
+    public CustomerAppService(CustomerRepository customerRepository, CustomerHelper customerHelper) {
+        this.customerRepository = customerRepository;
+        this.customerHelper = customerHelper;
+    }
 
     @Override
     public boolean add() {
-        try {
-            Optional<Customer> customer = helperCustomer.create();
-            if (customer.isPresent()) {
-                customerRepository.save(customer.get());
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+        Optional<Customer> optionalCustomer = customerHelper.create();
+        if (optionalCustomer.isEmpty()) {
+            return false;
         }
-        return false;
+        customerRepository.save(optionalCustomer.get());
+        return true;
     }
 
     @Override
     public boolean print() {
-        return helperCustomer.printList();
-    }
-
-    public List<Customer> list() {
-        return customerRepository.findAll();
+        return customerHelper.printList(customerRepository.findAll(), true);
     }
 
     @Override
     public boolean edit() {
-        try {
-
-            Customer customer = helperCustomer.update();
-            if (helperCustomer.update(customer)) {
-                customerRepository.save(customer);
-                System.out.println("Клиент успешно обновлен.");
-                return true;
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка при редактировании клиента: " + e.getMessage());
+        Optional<Customer> optionalModifyCustomer = getCustomerForModify();
+        if (optionalModifyCustomer.isEmpty()) {
+            return false;
         }
-        return false;
+        Optional<Customer> optionalModifiedCustomer = customerHelper.update(optionalModifyCustomer.get());
+        customerRepository.save(optionalModifiedCustomer.get());
+        System.out.println("Клиент успешно обновлен.");
+        return true;
     }
 
+    private Optional<Customer> getCustomerForModify() {
+        Optional<Long> optionalCustomerId = customerHelper.getIdModifyCustomer(customerRepository.findAll(), true);
+        if (optionalCustomerId.isEmpty()) {
+            return Optional.empty();
+        }
+        return customerRepository.findById(optionalCustomerId.get());
+    }
 }
