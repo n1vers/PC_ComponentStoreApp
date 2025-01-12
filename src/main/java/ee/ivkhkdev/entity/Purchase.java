@@ -1,33 +1,32 @@
-package ee.ivkhkdev.model;
+package ee.ivkhkdev.entity;
+
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
-
-public class Purchase implements Serializable {
-    private UUID id;
+@Entity
+public class Purchase {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "component_id")
     private Component component;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
     private LocalDate purchaseDate;
 
     public Purchase() {
-        this.id = UUID.randomUUID();
-        this.purchaseDate = LocalDate.now();
     }
 
-    public Purchase(Component component, Customer customer) {
-        this.id = UUID.randomUUID();
-        this.component = component;
-        this.customer = customer;
-        this.purchaseDate = LocalDate.now();
-    }
-
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -57,10 +56,9 @@ public class Purchase implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Purchase that = (Purchase) o;
-        return Objects.equals(id, that.id) && Objects.equals(component, that.component) && Objects.equals(customer, that.customer) && Objects.equals(purchaseDate, that.purchaseDate);
+        Purchase purchase = (Purchase) o;
+        return Objects.equals(id, purchase.id) && Objects.equals(component, purchase.component) && Objects.equals(customer, purchase.customer) && Objects.equals(purchaseDate, purchase.purchaseDate);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class Purchase implements Serializable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("PurchaseReceipt{");
+        final StringBuilder sb = new StringBuilder("Purchase{");
         sb.append("id=").append(id);
         sb.append(", component=").append(component);
         sb.append(", customer=").append(customer);

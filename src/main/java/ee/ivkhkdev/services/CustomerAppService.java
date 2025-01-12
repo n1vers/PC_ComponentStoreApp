@@ -1,65 +1,58 @@
 package ee.ivkhkdev.services;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.AppService;
-import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.interfaces.AppRepository;
+import ee.ivkhkdev.helpers.Helper;
+import ee.ivkhkdev.entity.Customer;
+import ee.ivkhkdev.repositories.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class CustomerAppService implements AppService<Customer> {
-
-    private AppRepository<Customer> appRepository;
-    private AppHelper<Customer> appHelperCustomer;
-
-    public CustomerAppService(AppRepository<Customer> appRepository, AppHelper<Customer> appHelperCustomer) {
-
-        this.appRepository = appRepository;
-        this.appHelperCustomer = appHelperCustomer;
-    }
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private Helper<Customer> helperCustomer;
 
     @Override
     public boolean add() {
-        Customer customer = appHelperCustomer.create();
-        if (customer == null) return false;
         try {
-            appRepository.save(customer);
-            return true;
+            Optional<Customer> customer = helperCustomer.create();
+            if (customer.isPresent()) {
+                customerRepository.save(customer.get());
+                return true;
+            }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            return false;
         }
+        return false;
     }
 
     @Override
     public boolean print() {
-        return appHelperCustomer.printList(appRepository.load());
+        return helperCustomer.printList();
     }
 
     public List<Customer> list() {
-        return appRepository.load();
+        return customerRepository.findAll();
     }
 
     @Override
     public boolean edit() {
-        List<Customer> customers = appRepository.load();
-        Customer updatedCustomer = appHelperCustomer.update(customers);
-        if (updatedCustomer == null) {
-            return false;
-        }
         try {
-            int index = customers.indexOf(updatedCustomer);
-            if (index != -1) {
-                appRepository.update(index, updatedCustomer);
+
+            Customer customer = helperCustomer.update();
+            if (helperCustomer.update(customer)) {
+                customerRepository.save(customer);
+                System.out.println("Клиент успешно обновлен.");
                 return true;
-            } else {
-                System.out.println("Клиент не найден в списке.");
-                return false;
             }
         } catch (Exception e) {
-            System.out.println("Ошибка при обновлении клиента: " + e.getMessage());
-            return false;
+            System.out.println("Ошибка при редактировании клиента: " + e.getMessage());
         }
+        return false;
     }
 
 }

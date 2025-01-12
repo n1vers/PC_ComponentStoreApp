@@ -1,34 +1,31 @@
-package ee.ivkhkdev.model;
+package ee.ivkhkdev.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
-
-public class Customer implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
+@Entity
+public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private double cash;
 
     public Customer() {
-        this.id = UUID.randomUUID();
     }
 
-    public Customer( String firstName, String lastName, String email, double cash) {
-        this.id = UUID.randomUUID();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.cash = cash;
-    }
-
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -66,7 +63,6 @@ public class Customer implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
         return Double.compare(cash, customer.cash) == 0 && Objects.equals(id, customer.id) && Objects.equals(firstName, customer.firstName) && Objects.equals(lastName, customer.lastName) && Objects.equals(email, customer.email);

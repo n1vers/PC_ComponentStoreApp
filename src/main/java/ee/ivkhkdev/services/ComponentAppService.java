@@ -1,49 +1,50 @@
 package ee.ivkhkdev.services;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.AppService;
-import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.interfaces.AppRepository;
+import ee.ivkhkdev.helpers.Helper;
+import ee.ivkhkdev.entity.Component;
+import ee.ivkhkdev.repositories.ComponentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class ComponentAppService implements AppService<Component> {
-
-    private AppRepository<Component> appRepository;
-    private AppHelper<Component> appHelperComponent;
-
-    public ComponentAppService(AppRepository<Component> appRepository, AppHelper<Component> apphelperComponent) {
-        this.appRepository = appRepository;
-        this.appHelperComponent = apphelperComponent;
-    }
+    @Autowired
+    private ComponentRepository componentRepository;
+    @Autowired
+    private Helper<Component> helperComponent;
 
     @Override
     public boolean add(){
-        Component component = appHelperComponent.create();
-        if(component == null) return false;
         try {
-            appRepository.save(component);
-            return true;
+            Optional<Component> component = helperComponent.create();
+            if (component.isPresent()) {
+                componentRepository.save(component.get());
+                return true;
+            }
         }catch (Exception e) {
-            System.out.println("Ошибка: " + e.toString());
-            return false;
+            System.out.println("Ошибка: " + e.getMessage());
         }
+        return false;
     }
 
     @Override
     public boolean print(){
-        return appHelperComponent.printList(appRepository.load());
+        return helperComponent.printList();
     }
 
     @Override
     public List<Component> list() {
-        return appRepository.load();
+        return componentRepository.findAll();
     }
 
     @Override
     public boolean edit(){
         List<Component> components = appRepository.load();
-        Component updateComponent = appHelperComponent.update(components);
+        Component updateComponent = helperComponent.update(components);
         if(updateComponent == null) return false;
         try {
             int index = components.indexOf(updateComponent);

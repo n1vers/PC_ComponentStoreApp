@@ -1,60 +1,55 @@
 package ee.ivkhkdev.helpers;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.interfaces.AppService;
-import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.model.Customer;
-import ee.ivkhkdev.model.Purchase;
+import ee.ivkhkdev.input.Input;
+import ee.ivkhkdev.repositories.PurchaseRepository;
+import ee.ivkhkdev.services.AppService;
+import ee.ivkhkdev.entity.Component;
+import ee.ivkhkdev.entity.Customer;
+import ee.ivkhkdev.entity.Purchase;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
-public class PurchaseAppHelper implements AppHelper<Purchase> {
-    private final Input input;
-    private final AppService<Component> componentAppService;
-    private final AppService<Customer> customerAppService;
-
-    public PurchaseAppHelper(Input input, AppService<Component> componentAppService, AppService<Customer> customerAppService) {
-        this.input = input;
-        this.componentAppService = componentAppService;
-        this.customerAppService = customerAppService;
-    }
+@org.springframework.stereotype.Component
+public class PurchaseHelper implements Helper<Purchase> {
+    @Autowired
+    private  Input input;
+    @Autowired
+    private  AppService<Component> componentAppService;
+    @Autowired
+    private  AppService<Customer> customerAppService;
+    @Autowired
+    private PurchaseRepository purchaseRepository;
 
     @Override
-    public Purchase create() {
-        if (!componentAppService.print()) {
-            return null;
-        }
+    public Optional<Purchase> create() {
         System.out.print("Выберите номер компонента для покупки: ");
         int componentNumber = Integer.parseInt(input.nextLine());
         Component component = componentAppService.list().get(componentNumber - 1);
-
-        if (!customerAppService.print()) {
-            return null;
-        }
         System.out.print("Выберите номер покупателя: ");
         int customerNumber = Integer.parseInt(input.nextLine());
         Customer customer = customerAppService.list().get(customerNumber - 1);
 
-//        double newBalance = customer.getCash() - component.getPrice();
-//        if (newBalance < 0) {
-//            System.out.println("Недостаточно средств на балансе клиента для этой покупки.");
-//            return null;
-//        }
-//        customer.setCash(newBalance);
-
         Purchase purchase = new Purchase();
+
         purchase.setComponent(component);
         purchase.setCustomer(customer);
         purchase.setPurchaseDate(LocalDate.now());
 
-        return purchase;
+        return Optional.of(purchase);
     }
 
     @Override
-    public boolean printList(List<Purchase> purchases) {
+    public boolean update(Purchase purchase) {
+        return false;
+    }
+
+    @Override
+    public boolean printList() {
+        List<Purchase> purchases = purchaseRepository.findAll();
         if (purchases.isEmpty()) {
             System.out.println("Нет покупок.");
             return false;
@@ -73,10 +68,6 @@ public class PurchaseAppHelper implements AppHelper<Purchase> {
         }
 
         return true;
-    }
-    @Override
-    public Purchase update(List<Purchase> purchases) {
-        return null;
     }
 
 }

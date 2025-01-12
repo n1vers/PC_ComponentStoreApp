@@ -1,43 +1,43 @@
 package ee.ivkhkdev.services;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.AppService;
-import ee.ivkhkdev.model.Category;
-import ee.ivkhkdev.interfaces.AppRepository;
+import ee.ivkhkdev.helpers.Helper;
+import ee.ivkhkdev.entity.Category;
+import ee.ivkhkdev.repositories.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class CategoryAppService implements AppService<Category> {
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private Helper<Category> helperCategory;
 
-    private AppRepository<Category> appRepository;
-    private AppHelper<Category> appHelperCategory;
-
-    public CategoryAppService(AppRepository<Category> appRepository, AppHelper<Category> appHelperCategory) {
-        this.appRepository = appRepository;
-        this.appHelperCategory = appHelperCategory;
-    }
-
-
+    @Override
     public boolean add(){
-        Category category = appHelperCategory.create();
-        if (category == null) return false;
         try {
-            appRepository.save(category);
-            return true;
-        }catch (Exception e) {
-            System.out.println("Ошибка: " + e.toString());
-            return false;
+            Optional<Category> category = helperCategory.create();
+            if (category.isPresent()) {
+                categoryRepository.save(category.get());
+                return true;
+            }
+        }catch (Exception e){
+            System.out.println("Error: "+e.getMessage());
         }
+        return false;
     }
 
     @Override
     public boolean print(){
-        return appHelperCategory.printList(appRepository.load());
+        return helperCategory.printList();
     }
 
     @Override
     public List<Category> list(){
-        return appRepository.load();
+        return categoryRepository.findAll();
     }
 
     @Override

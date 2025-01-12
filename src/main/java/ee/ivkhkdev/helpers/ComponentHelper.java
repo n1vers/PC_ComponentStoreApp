@@ -1,80 +1,76 @@
 package ee.ivkhkdev.helpers;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.Input;
-import ee.ivkhkdev.model.Category;
-import ee.ivkhkdev.model.Component;
-import ee.ivkhkdev.interfaces.AppService;
+import ee.ivkhkdev.input.Input;
+import ee.ivkhkdev.entity.Category;
+import ee.ivkhkdev.entity.Component;
+import ee.ivkhkdev.repositories.ComponentRepository;
+import ee.ivkhkdev.services.AppService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
-public class ComponentAppHelper implements AppHelper<Component> {
-
-    private final Input input;
-    private final AppService<Category> categoryAppService;
-
-    public ComponentAppHelper(Input input, AppService<Category> categoryAppService) {
-        this.input = input;
-        this.categoryAppService = categoryAppService;
-    }
+@org.springframework.stereotype.Component
+public class ComponentHelper implements Helper<Component> {
+    @Autowired
+    private  Input input;
+    @Autowired
+    private  Helper<Category> categoryHelper;
+    @Autowired
+    private ComponentRepository componentRepository;
 
     @Override
-    public Component create() {
-        Component component = new Component();
+    public Optional<Component> create() {
         try {
+            Component component = new Component();
             System.out.print("Введите бренд компонента: ");
             component.setBrand(input.nextLine());
-
-            System.out.println("Список категорий:");
-            List<Category> categories = categoryAppService.list();
-            for (int i = 0; i < categories.size(); i++) {
-                System.out.printf("%d. %s%n", i + 1, categories.get(i).getCategoryName());
+            Optional<Category> category = categoryHelper.create();
+            if (category.isEmpty()) {
+                return Optional.empty();
             }
-            System.out.printf("Выберите номер категории из списка: ");
-            int numberCategory = Integer.parseInt(input.nextLine());
-            component.getCategory().add(categoryAppService.list().get(numberCategory - 1));
-
+            component.setCategory(category.get());
             System.out.print("Введите модель компонента: ");
             component.setModel(input.nextLine());
             System.out.print("Введите цену компонента: ");
             component.setPrice(Double.parseDouble(input.nextLine()));
-            return component;
+            System.out.println("Количество товара: ");
+            component.setAmount(Integer.parseInt(input.nextLine()));
+            return Optional.of(component);
         } catch (Exception e) {
             System.out.println("Ошибка при создании компонента: " + e.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 
     @Override
-    public boolean printList(List<Component> components) {
+    public boolean printList() {
+        List<Component> components = componentRepository.findAll();
         try {
-            if (components.size() == 0) return false;
+            if (components.isEmpty()) return false;
             for (int i = 0; i < components.size(); i++) {
-                StringBuilder sb = new StringBuilder();
-                for (int j = 0; j < components.get(i).getCategory().size(); j++) {
-                    sb.append(components.get(i).getCategory().get(j).getCategoryName());
-                    if (j < components.get(i).getCategory().size() - 1) {
-                        sb.append(", ");
-                    }
-                }
-
-                String outputLine = String.format(Locale.ENGLISH,
-                        "%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f $%n ",
+                Component component = components.get(i);
+                System.out.printf(Locale.ENGLISH,
+                        "%d. Бренд: %s, Модель: %s, Категория: %s, Цена: %.2f $ , Количество:%s шт. %n ",
                         i + 1,
-                        components.get(i).getBrand(),
-                        components.get(i).getModel(),
-                        sb.toString(),
-                        components.get(i).getPrice()
+                        component.getBrand(),
+                        component.getModel(),
+                        component.getCategory(),
+                        component.getPrice(),
+                        component.getAmount()
                 );
-
-                System.out.print(outputLine);
             }
             return true;
         } catch (Exception e) {
             System.out.println("Ошибка при выводе списка компонентов: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public boolean update(Component component) {
+        return false;
     }
 
     @Override

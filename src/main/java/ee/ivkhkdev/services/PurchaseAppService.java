@@ -1,42 +1,43 @@
 package ee.ivkhkdev.services;
 
-import ee.ivkhkdev.interfaces.AppHelper;
-import ee.ivkhkdev.interfaces.AppRepository;
-import ee.ivkhkdev.interfaces.AppService;
-import ee.ivkhkdev.model.Purchase;
+import ee.ivkhkdev.helpers.Helper;
+import ee.ivkhkdev.entity.Purchase;
+import ee.ivkhkdev.repositories.PurchaseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class PurchaseAppService implements AppService<Purchase> {
-    private final AppHelper<Purchase> purchaseAppHelper;
-    private final AppRepository<Purchase> appRepository;
-
-    public PurchaseAppService(AppHelper<Purchase> purchaseAppHelper, AppRepository<Purchase> appRepository) {
-        this.purchaseAppHelper = purchaseAppHelper;
-        this.appRepository = appRepository;
-    }
+    @Autowired
+    private  Helper<Purchase> purchaseHelper;
+    @Autowired
+    private PurchaseRepository purchaseRepository;
 
     @Override
     public boolean add() {
-        Purchase purchase = purchaseAppHelper.create();
-        if (purchase == null) return false;
         try {
-            appRepository.save(purchase);
-            return true;
+            Optional<Purchase> purchase = purchaseHelper.create();
+            if (purchase.isPresent()) {
+                purchaseRepository.save(purchase.get());
+                return true;
+            }
         } catch (Exception e) {
             System.out.println("Ошибка при добавлении покупки: " + e.getMessage());
-            return false;
         }
+        return false;
     }
 
     @Override
     public boolean print() {
-        return purchaseAppHelper.printList(appRepository.load());
+        return purchaseHelper.printList();
     }
 
     @Override
     public List<Purchase> list() {
-        return appRepository.load();
+        return purchaseRepository.findAll();
     }
 
     @Override
